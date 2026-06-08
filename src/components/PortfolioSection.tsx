@@ -26,6 +26,14 @@ const PROJECTS = [
     image: '/portfolio/eazyfly.png',
     thumbnail: { fit: 'cover' as ThumbnailFit, bg: 'bg-[#0c1210]' },
   },
+  {
+    title: 'Shaheen Al Jabal',
+    description:
+      'Industrial building materials supplier with a bold hero, product portfolio, and trust-focused B2B presence across the UAE.',
+    url: 'https://www.shaheenaljabal.com',
+    image: '/portfolio/shaheen-al-jabal.png',
+    thumbnail: { fit: 'cover' as ThumbnailFit, bg: 'bg-[#1a1a1a]' },
+  },
 ] as const
 
 const fadeIn = {
@@ -66,7 +74,7 @@ function ProjectCard({
           open()
         }
       }}
-      className="portfolio-card group flex h-full min-h-[420px] cursor-pointer flex-col overflow-hidden rounded-2xl border border-charcoal/10 bg-white shadow-sm md:min-h-[440px]"
+      className="portfolio-card group flex h-full min-h-[420px] cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm md:min-h-[440px]"
     >
       <div
         className={`portfolio-card-glitch relative aspect-[16/10] w-full shrink-0 overflow-hidden ${thumbnail.bg}`}
@@ -86,9 +94,9 @@ function ProjectCard({
       </div>
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-display text-lg font-bold uppercase tracking-tight text-ink">{title}</h3>
-        <p className="mt-2 flex-1 font-sans text-sm leading-relaxed text-charcoal/70">{description}</p>
-        <span className="btn-glitch mt-5 inline-flex w-fit items-center gap-2 rounded-lg border border-charcoal/15 bg-mist/50 px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-ink transition hover:border-lime/50 hover:shadow-lime-glow">
+        <h3 className="portfolio-card-title font-display text-lg font-bold uppercase tracking-tight">{title}</h3>
+        <p className="portfolio-card-copy mt-2 flex-1 font-sans text-sm leading-relaxed">{description}</p>
+        <span className="portfolio-card-cta btn-glitch mt-5 inline-flex w-fit items-center gap-2 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow">
           Visit website
           <ExternalLink size={14} className="text-lime" aria-hidden />
         </span>
@@ -99,8 +107,8 @@ function ProjectCard({
 
 export function PortfolioSection() {
   return (
-    <section id="portfolio" className="relative scroll-mt-24 bg-white py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
+    <section id="portfolio" className="section-surface relative scroll-mt-24 py-24 md:py-32">
+      <div className="site-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -108,18 +116,16 @@ export function PortfolioSection() {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] as const }}
           className="max-w-2xl"
         >
-          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.35em] text-charcoal/50">Selected work</p>
-          <h2 className="mt-3 font-display text-4xl font-extrabold uppercase tracking-tight text-ink md:text-5xl">
+          <p className="section-label">Selected work</p>
+          <h2 className="section-title mt-3">
             <span className="glitch-heading" data-text="PORTFOLIO">
               PORTFOLIO
             </span>
           </h2>
-          <p className="mt-4 font-sans text-base leading-relaxed text-charcoal/70 md:text-lg">
-            Shipped websites — live previews from recent client builds.
-          </p>
+          <p className="section-body mt-4">Shipped websites — live previews from recent client builds.</p>
         </motion.div>
 
-        <div className="mt-14 grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-4">
           {PROJECTS.map((p, i) => (
             <ProjectCard key={p.url} {...p} index={i} />
           ))}

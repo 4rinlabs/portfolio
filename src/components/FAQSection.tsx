@@ -29,8 +29,8 @@ export function FaqSection() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section id="faq" className="scroll-mt-24 bg-mist py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
+    <section id="faq" className="section-alt scroll-mt-24 py-24 md:py-32">
+      <div className="site-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,36 +38,30 @@ export function FaqSection() {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] as const }}
           className="max-w-2xl"
         >
-          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.35em] text-charcoal/50">Answers</p>
-          <h2 className="mt-3 font-display text-4xl font-extrabold uppercase tracking-tight text-ink md:text-5xl">
+          <p className="section-label">Answers</p>
+          <h2 className="section-title mt-3">
             <span className="glitch-heading" data-text="FAQ">
               FAQ
             </span>
           </h2>
-          <p className="mt-4 font-sans text-base leading-relaxed text-charcoal/70 md:text-lg">
-            Straightforward details on how we collaborate and deliver.
-          </p>
+          <p className="section-body mt-4">Straightforward details on how we collaborate and deliver.</p>
         </motion.div>
 
-        <div className="mx-auto mt-14 max-w-3xl space-y-3">
+        <div className="mx-auto mt-14 w-full max-w-3xl space-y-3 lg:max-w-4xl xl:max-w-5xl">
           {FAQ.map((item, idx) => {
             const isOpen = open === idx
             return (
               <motion.div
                 key={item.q}
                 layout
-                className={`overflow-hidden rounded-xl border transition-colors duration-300 ${
-                  isOpen
-                    ? 'border-lime/50 bg-white shadow-[0_0_0_1px_rgba(127,255,0,0.25),0_12px_40px_rgba(0,0,0,0.06)]'
-                    : 'border-charcoal/10 bg-white/60 hover:border-charcoal/20'
-                }`}
+                className={`faq-item overflow-hidden rounded-xl border transition-colors duration-300 ${isOpen ? 'faq-item--open' : ''}`}
               >
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left md:px-6 md:py-5"
+                  className="faq-trigger flex w-full items-center justify-between gap-4 px-5 py-4 text-left md:px-6 md:py-5"
                 >
-                  <span className="font-display text-sm font-semibold uppercase tracking-tight text-ink md:text-base">
+                  <span className="faq-question font-display text-sm font-semibold uppercase tracking-tight md:text-base">
                     {item.q}
                   </span>
                   <motion.span
@@ -87,7 +81,7 @@ export function FaqSection() {
                       transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="border-t border-charcoal/10 px-5 pb-5 pt-4 font-sans text-sm leading-relaxed text-charcoal/75 md:px-6">
+                      <p className="faq-answer border-t px-5 pb-5 pt-4 font-sans text-sm leading-relaxed md:px-6">
                         {item.a}
                       </p>
                     </motion.div>

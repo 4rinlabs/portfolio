@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { scrollToSection } from '../lib/scroll'
+import { ThemeToggle } from './ThemeToggle'
 
 const LINKS = [
   { id: 'home', label: 'Home' },
@@ -35,24 +36,13 @@ export function Navbar() {
   }
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'border-b border-lime/25 bg-white/70 shadow-[0_12px_40px_rgba(0,0,0,0.06)] backdrop-blur-xl'
-          : 'border-b border-transparent bg-transparent'
-      }`}
-      style={
-        scrolled
-          ? { boxShadow: '0 0 0 1px rgba(127, 255, 0, 0.12), 0 12px 40px rgba(0,0,0,0.06)' }
-          : undefined
-      }
-    >
-      <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between px-5 md:px-8">
+    <header className={`nav-shell fixed inset-x-0 top-0 z-50 transition-all duration-[400ms] ${scrolled ? 'nav-shell-scrolled' : ''}`}>
+      <div className="site-container flex h-[4.5rem] items-center justify-between gap-4">
         <button
           type="button"
           onClick={() => go('home')}
           data-text="4RinLabs"
-          className="nav-brand-glitch font-display text-sm font-bold uppercase tracking-[0.2em] text-ink md:text-base"
+          className="nav-brand-glitch shrink-0 font-display text-sm font-bold uppercase tracking-[0.2em] md:text-base"
         >
           4RinLabs
         </button>
@@ -64,22 +54,28 @@ export function Navbar() {
               type="button"
               data-text={link.label.toUpperCase()}
               onClick={() => go(link.id)}
-              className="nav-glitch relative rounded-full px-3 py-2 font-sans text-[11px] font-semibold uppercase tracking-[0.16em] text-charcoal/80 transition-colors hover:text-ink"
+              className="nav-glitch nav-link relative rounded-full px-3 py-2 font-sans text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors duration-[400ms]"
             >
               <span>{link.label}</span>
             </button>
           ))}
+          <div className="nav-theme-toggle-wrap ml-0.5 flex items-center pl-3">
+            <ThemeToggle />
+          </div>
         </nav>
 
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-charcoal/10 text-ink md:hidden"
-          aria-expanded={mobileOpen}
-          aria-label="Toggle menu"
-          onClick={() => setMobileOpen((o) => !o)}
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="theme-toggle flex h-10 w-10 items-center justify-center rounded-lg"
+            aria-expanded={mobileOpen}
+            aria-label="Toggle menu"
+            onClick={() => setMobileOpen((o) => !o)}
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -89,15 +85,15 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] as const }}
-            className="border-t border-charcoal/10 bg-white/95 backdrop-blur-xl md:hidden"
+            className="nav-mobile-panel border-t md:hidden"
           >
-            <div className="flex flex-col gap-1 px-5 py-4">
+            <div className="site-container flex flex-col gap-1 py-4">
               {LINKS.map((link) => (
                 <button
                   key={link.id}
                   type="button"
                   onClick={() => go(link.id)}
-                  className="rounded-lg px-3 py-3 text-left font-display text-sm font-semibold uppercase tracking-[0.14em] text-ink hover:bg-lime/10"
+                  className="nav-mobile-link rounded-lg px-3 py-3 text-left font-display text-sm font-semibold uppercase tracking-[0.14em]"
                 >
                   {link.label}
                 </button>

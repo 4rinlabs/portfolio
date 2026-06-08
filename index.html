@@ -12,6 +12,12 @@
       rel="stylesheet"
     />
     <title>4RinLabs — Creative Web Studio</title>
+    <script>
+      (function () {
+        var theme = localStorage.getItem('theme')
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light')
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

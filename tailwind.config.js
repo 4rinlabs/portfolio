@@ -22,6 +22,13 @@ export default {
         'lime-fade': 'linear-gradient(135deg, rgba(127, 255, 0, 0.14) 0%, transparent 55%)',
         'lime-radial': 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(127, 255, 0, 0.22), transparent 65%)',
       },
+      maxWidth: {
+        site: '90rem',
+        'site-hero': '44rem',
+      },
+      screens: {
+        '3xl': '1920px',
+      },
     },
   },
   plugins: [],

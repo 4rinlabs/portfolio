@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { type FormEvent, useState } from 'react'
-import { BriefcaseBusiness, Camera, CheckCircle2, Loader2, MessageCircle } from 'lucide-react'
+import { CheckCircle2, Loader2 } from 'lucide-react'
+import { BsInstagram, BsLinkedin, BsWhatsapp } from 'react-icons/bs'
 import { MagneticButton } from './MagneticButton'
 import {
   hasValidationErrors,
@@ -10,13 +11,13 @@ import {
 } from '../lib/contactForm'
 
 const social = [
-  { href: 'https://wa.me/918129386952', label: 'WhatsApp', icon: MessageCircle },
+  { href: 'https://wa.me/919961386952', label: 'WhatsApp', Icon: BsWhatsapp },
   {
     href: 'https://www.instagram.com/4rinlabs?igsh=aDA0ZmFkMjVmd3A5',
     label: 'Instagram',
-    icon: Camera,
+    Icon: BsInstagram,
   },
-  { href: 'https://www.linkedin.com/in/4rinlabs/', label: 'LinkedIn', icon: BriefcaseBusiness },
+  { href: 'https://www.linkedin.com/in/4rinlabs/', label: 'LinkedIn', Icon: BsLinkedin },
 ] as const
 
 const inputClass = (hasError: boolean) =>
@@ -109,8 +110,8 @@ export function ContactSection() {
 
   return (
     <section id="contact" className="scroll-mt-24 bg-charcoal py-24 text-white md:py-32">
-      <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="grid gap-14 lg:grid-cols-[1fr_280px] lg:gap-16">
+      <div className="site-container">
+        <div className="grid gap-14 lg:grid-cols-[1fr_300px] xl:grid-cols-[1.15fr_280px] xl:gap-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -291,7 +292,7 @@ export function ContactSection() {
             className="flex flex-col gap-3"
           >
             <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.35em] text-lime/70">Connect</p>
-            {social.map(({ href, label, icon: Icon }) => (
+            {social.map(({ href, label, Icon }) => (
               <motion.a
                 key={label}
                 href={href}
@@ -299,11 +300,10 @@ export function ContactSection() {
                 rel="noopener noreferrer"
                 whileHover={{ x: 4 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="btn-glitch flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:border-lime/50 hover:bg-white/[0.06] hover:shadow-lime-glow"
+                className="btn-glitch group flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:border-lime/50 hover:bg-white/[0.06] hover:shadow-lime-glow"
               >
                 <Icon
-                  size={20}
-                  className="shrink-0 text-lime transition-transform duration-300 group-hover:scale-110"
+                  className="size-5 shrink-0 text-lime transition-transform duration-300 group-hover:scale-110"
                   aria-hidden
                 />
                 {label}
