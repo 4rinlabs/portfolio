@@ -44,16 +44,17 @@ export function HeroSection() {
             <motion.div className="hero-title-glow" style={{ x: glowX, y: glowY }} aria-hidden>
               <div className="hero-title-glow-core" />
             </motion.div>
-            <h1 className="hero-title">
+            
+            <p className="hero-title">
               <span className="glitch-hero" data-text="4RinLabs">
                 <span className="relative z-10">4RinLabs</span>
               </span>
-            </h1>
+            </p>
           </div>
 
-          <p className="hero-tagline mx-auto mt-8 max-w-md font-sans text-base font-medium sm:text-lg md:mt-10 md:text-xl">
-            Digital experiences, <span className="hero-accent">built right.</span>
-          </p>
+          <h1 className="hero-tagline mx-auto mt-8 max-w-md font-sans text-base font-medium sm:text-lg md:mt-10 md:text-xl">
+            Custom Software <span className="hero-accent">& AI Development Company.</span>
+          </h1>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4 md:mt-12">
             <MagneticButton
