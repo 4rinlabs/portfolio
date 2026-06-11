@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 interface Service {
@@ -30,7 +31,10 @@ export function ServicesSectionClient({
   services,
 }: ServicesSectionClientProps) {
   return (
-    <section id="services" className="section-alt scroll-mt-24 py-24 md:py-32">
+    <section
+      id="services"
+      className="section-alt scroll-mt-24 py-24 md:py-32"
+    >
       <div className="site-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -51,8 +55,8 @@ export function ServicesSectionClient({
           </h2>
 
           <p className="section-body mt-4">
-            End-to-end web execution — from brand-sharp marketing sites to
-            complex product interfaces.
+            End-to-end execution — from AI systems and SaaS platforms to custom
+            software, web applications, mobile apps, and intelligent automation.
           </p>
         </motion.div>
 
@@ -61,44 +65,70 @@ export function ServicesSectionClient({
             const dark = i % 2 === 1
 
             return (
-              <motion.article
+              <Link
                 key={s.id}
-                custom={i}
-                variants={cardVariants}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: '-40px' }}
-                className={`service-card group relative overflow-hidden rounded-2xl border p-7 transition-all duration-300 ${
-                  dark ? 'service-card--invert' : ''
-                } hover:border-lime/40 hover:shadow-lime-glow`}
+                href={`/services/${s.slug}`}
+                className="block"
               >
-                <div
-                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-lime/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
-                  aria-hidden
-                />
-
-                <h3 className="font-display text-xl font-bold uppercase tracking-tight">
-                  <span
-                    className="service-title-glitch"
-                    data-text={s.name}
-                  >
-                    {s.name}
-                  </span>
-                </h3>
-
-                <p
-                  className={`service-card-copy mt-3 font-sans text-sm leading-relaxed ${
-                    dark ? 'service-card-copy--invert' : ''
-                  }`}
+                <motion.div
+                  custom={i}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: '-40px' }}
+                  className={`service-card group relative h-full overflow-hidden rounded-2xl border p-7 transition-all duration-300 ${
+                    dark ? 'service-card--invert' : ''
+                  } hover:border-lime/40 hover:shadow-lime-glow`}
                 >
-                  {s.shortDescription}
-                </p>
+                  <div
+                    className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-lime/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
+                    aria-hidden
+                  />
 
-                <div className="mt-6 h-px w-12 bg-gradient-to-r from-lime to-transparent opacity-60 transition-all group-hover:w-full group-hover:opacity-100" />
-              </motion.article>
+                  <h3 className="font-display text-xl font-bold uppercase tracking-tight">
+                    <span
+                      className="service-title-glitch"
+                      data-text={s.name}
+                    >
+                      {s.name}
+                    </span>
+                  </h3>
+
+                  <p
+                    className={`service-card-copy mt-3 font-sans text-sm leading-relaxed ${
+                      dark ? 'service-card-copy--invert' : ''
+                    }`}
+                  >
+                    {s.shortDescription}
+                  </p>
+
+                  <div className="mt-6 flex items-center justify-between">
+                    <div className="h-px w-12 bg-gradient-to-r from-lime to-transparent opacity-60 transition-all group-hover:w-full group-hover:opacity-100" />
+
+                    <span className="ml-4 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] text-lime opacity-0 transition-all duration-300 group-hover:opacity-100">
+                      Explore →
+                    </span>
+                  </div>
+                </motion.div>
+              </Link>
             )
           })}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15 }}
+          className="mt-12 flex justify-center"
+        >
+          <Link
+            href="/services"
+            className="inline-flex items-center rounded-full border border-lime/40 px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] transition-all duration-300 hover:bg-lime hover:text-black hover:shadow-lime-glow"
+          >
+            View All Services
+          </Link>
+        </motion.div>
       </div>
     </section>
   )
