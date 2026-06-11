@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
+
 async function requireAuth() {
   const session = await auth()
   if (!session) redirect('/admin/login')
@@ -451,4 +452,3 @@ export async function deleteLeadAction(formData: FormData): Promise<void> {
 }
 
 // ─── Legacy aliases (keep old imports working) ────────────────────────────────
-export { createServiceAction as createService }
