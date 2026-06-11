@@ -1,12 +1,77 @@
 {
-    "name": "4RinLabs",
-    "website": "https://www.4rinlabs.com",
-    "industry": "Software Development",
-    "services": [
-      "AI Development",
-      "Custom Software Development",
-      "SaaS Development",
-      "Web Development",
-      "Mobile App Development"
-    ]
-  }
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "4RinLabs",
+  "legalName": "4RinLabs",
+  "url": "https://www.4rinlabs.com",
+  "logo": "https://www.4rinlabs.com/logo.png",
+  "description": "AI Development, SaaS Development, Web Development and Custom Software Solutions for startups and enterprises worldwide.",
+  "foundingDate": "2020",
+  "industry": "Software Development",
+  "email": "4rinlabs@gmail.com",
+  "sameAs": [
+    "https://www.linkedin.com/company/4rinlabs",
+    "https://github.com/4rinlabs",
+    "https://www.instagram.com/4rinlabs",
+    "https://wa.me/919961386952"
+  ],
+  "services": [
+    {
+      "@type": "Service",
+      "name": "AI Development",
+      "description": "Custom AI solutions, LLM integrations, RAG systems, AI agents, and intelligent automation.",
+      "url": "https://www.4rinlabs.com/services/ai-development"
+    },
+    {
+      "@type": "Service",
+      "name": "Custom Software Development",
+      "description": "Bespoke software solutions engineered around your workflows and business logic.",
+      "url": "https://www.4rinlabs.com/services/custom-software-development"
+    },
+    {
+      "@type": "Service",
+      "name": "SaaS Development",
+      "description": "End-to-end SaaS platform development from MVP to enterprise-ready product.",
+      "url": "https://www.4rinlabs.com/services/saas-development"
+    },
+    {
+      "@type": "Service",
+      "name": "Web Development",
+      "description": "From brand-sharp marketing sites to complex product interfaces — pixel-perfect execution.",
+      "url": "https://www.4rinlabs.com/services/web-development"
+    },
+    {
+      "@type": "Service",
+      "name": "Mobile App Development",
+      "description": "Custom Android and iOS applications with intuitive UX, API integrations, and performance.",
+      "url": "https://www.4rinlabs.com/services/mobile-app-development"
+    },
+    {
+      "@type": "Service",
+      "name": "WhatsApp CRM",
+      "description": "WhatsApp automation, lead management, broadcast messaging, and CRM integration.",
+      "url": "https://www.4rinlabs.com/services/whatsapp-crm"
+    },
+    {
+      "@type": "Service",
+      "name": "Digital Marketing",
+      "description": "Social media marketing, content strategy, ad campaigns, and performance marketing.",
+      "url": "https://www.4rinlabs.com/services/digital-marketing"
+    }
+  ],
+  "areaServed": "Worldwide",
+  "knowsAbout": [
+    "AI Development",
+    "Large Language Models",
+    "RAG Systems",
+    "AI Agents",
+    "SaaS Development",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "PostgreSQL",
+    "Mobile Development",
+    "WhatsApp Business API",
+    "Digital Marketing"
+  ]
+}

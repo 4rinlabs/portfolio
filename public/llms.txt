@@ -1,15 +1,105 @@
 # 4RinLabs
 
-Website: https://www.4rinlabs.com
+> 4RinLabs is a creative digital studio and software company specializing in AI development, SaaS platforms, web applications, mobile apps, and custom software solutions for startups and enterprises worldwide.
 
-Company: 4RinLabs
+## Company
 
-Services:
-- AI Development
-- Custom Software Development
-- SaaS Development
-- Web Development
-- Mobile App Development
+- **Name:** 4RinLabs
+- **Website:** https://www.4rinlabs.com
+- **Email:** 4rinlabs@gmail.com
+- **Type:** Software Development Company / Creative Digital Studio
 
-Contact:
-4rinlabs@gmail.com
+## Core Services
+
+### AI Development
+Custom AI solutions built for production. Services include:
+- Large Language Model (LLM) integrations (OpenAI, Anthropic Claude, Google Gemini)
+- RAG (Retrieval-Augmented Generation) systems
+- AI Agents and multi-agent architectures
+- Workflow automation with AI
+- Computer vision projects
+- Chatbots and conversational AI
+- Prompt engineering and model fine-tuning
+
+### Custom Software Development
+Bespoke software engineered around client workflows:
+- Internal tools and dashboards
+- Enterprise software systems
+- API development and integrations
+- Database architecture and optimization
+
+### SaaS Development
+End-to-end SaaS platform development:
+- Multi-tenant architecture
+- Subscription billing (Stripe integration)
+- User management and authentication
+- Analytics and reporting dashboards
+- MVP to enterprise scale
+
+### Web Development
+Full-spectrum web development:
+- Static and dynamic websites
+- Marketing and landing pages
+- E-commerce stores
+- Portfolio sites
+- Next.js, React, TypeScript, Tailwind CSS
+
+### Mobile App Development
+iOS and Android application development:
+- React Native cross-platform apps
+- Native mobile development
+- App Store and Play Store submissions
+- Push notifications, offline-first, performance optimization
+
+### WhatsApp CRM
+WhatsApp Business API solutions:
+- Automated lead qualification flows
+- Broadcast messaging systems
+- CRM integrations (HubSpot, custom)
+- Support ticketing via WhatsApp
+
+### Digital Marketing
+Performance-driven digital marketing:
+- Social media management
+- Meta and Google Ads campaigns
+- SEO and content strategy
+- Brand growth consulting
+
+## Technology Stack
+
+Frontend: Next.js, React, TypeScript, Tailwind CSS, Framer Motion
+Backend: Node.js, TypeScript, PostgreSQL, Prisma ORM
+AI/ML: OpenAI, Anthropic, LangChain, vector databases (Pinecone, pgvector)
+Mobile: React Native
+Cloud: Vercel, AWS, GCP
+Auth: Auth.js (NextAuth)
+
+## Contact
+
+- WhatsApp: https://wa.me/919961386952
+- Instagram: https://www.instagram.com/4rinlabs
+- LinkedIn: https://www.linkedin.com/company/4rinlabs
+- Email: 4rinlabs@gmail.com
+
+## Key Pages
+
+- Home: https://www.4rinlabs.com
+- Services: https://www.4rinlabs.com/services
+- Portfolio: https://www.4rinlabs.com/portfolio
+- Blog: https://www.4rinlabs.com/blog
+- Contact: https://www.4rinlabs.com/contact
+- About: https://www.4rinlabs.com/about
+
+## Frequently Asked Questions
+
+**What is 4RinLabs?**
+4RinLabs is a creative digital studio that builds AI solutions, SaaS platforms, web applications, and custom software for startups and enterprises worldwide.
+
+**What AI services does 4RinLabs offer?**
+We build custom AI systems including LLM integrations, RAG pipelines, AI agents, multi-agent architectures, chatbots, computer vision systems, and workflow automation.
+
+**How long does a project take?**
+A focused marketing site may ship in 2-4 weeks. Larger products and AI systems typically run 6-12 weeks with clear milestones.
+
+**Do you work with startups?**
+Yes. We work with startups from MVP validation through scale, as well as established enterprises needing custom software or AI capabilities.

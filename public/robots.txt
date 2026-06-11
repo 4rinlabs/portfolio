@@ -1,13 +1,8 @@
 User-agent: *
 Allow: /
 
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
 
 Sitemap: https://www.4rinlabs.com/sitemap.xml
