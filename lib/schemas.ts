@@ -98,6 +98,31 @@ export const BlogPostSchema = z.object({
 
 export type BlogPostFormData = z.infer<typeof BlogPostSchema>
 
+// ─── Products ─────────────────────────────────────────────────────────────────
+
+export const ProductSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(150),
+  slug: z
+    .string()
+    .min(1, 'Slug is required')
+    .max(150)
+    .regex(/^[a-z0-9-]+$/, 'Slug may only contain lowercase letters, numbers and hyphens'),
+  tagline: z.string().min(1, 'Tagline is required').max(200),
+  description: z.string().min(1, 'Description is required'),
+  coverImage: z.string().optional().or(z.literal('')),
+  tags: z.string().optional().or(z.literal('')),       // comma-separated, stored as array
+  category: z.string().max(100).optional().or(z.literal('')),
+  productUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  githubUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  featured: z.boolean().default(false),
+  active: z.boolean().default(true),
+  order: z.number().int().min(0).default(0),
+  seoTitle: z.string().max(70).optional().or(z.literal('')),
+  seoDescription: z.string().max(160).optional().or(z.literal('')),
+})
+
+export type ProductFormData = z.infer<typeof ProductSchema>
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Convert a title to a URL-safe slug */

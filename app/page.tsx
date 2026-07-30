@@ -2,6 +2,7 @@ import { Navbar } from '@/components/Navbar'
 import { HeroSection } from '@/components/HeroSection'
 import { ServicesSection } from '@/components/ServicesSection'
 import { PortfolioSection } from '@/components/PortfolioSection'
+import { ProductsSection } from '@/components/ProductsSection'
 import { FaqSection } from '@/components/FAQSection'
 import { ContactSection } from '@/components/ContactSection'
 import { SiteFooter } from '@/components/SiteFooter'
@@ -26,6 +27,8 @@ export default function HomePage() {
           <ServicesSection />
 
           <PortfolioSection />
+
+          <ProductsSection />
 
           <BlogPreviewSection />
 

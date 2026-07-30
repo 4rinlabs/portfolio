@@ -8,6 +8,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 const NAV = [
   { href: '/admin', label: 'Dashboard', exact: true },
   { href: '/admin/services', label: 'Services' },
+  { href: '/admin/products', label: 'Products' },
   { href: '/admin/portfolio', label: 'Portfolio' },
   { href: '/admin/blog', label: 'Blog' },
   { href: '/admin/leads', label: 'Leads' },

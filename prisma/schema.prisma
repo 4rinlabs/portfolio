@@ -85,6 +85,29 @@ model Service {
   updatedAt        DateTime @updatedAt
 }
 
+// ─── Products ─────────────────────────────────────────────────────────────────
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  tagline        String
+  description    String   @db.Text
+  coverImage     String
+  gallery        String[] @default([])
+  tags           String[] @default([])
+  category       String?
+  productUrl     String?
+  githubUrl      String?
+  featured       Boolean  @default(false)
+  active         Boolean  @default(true)
+  order          Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 // ─── Portfolio ────────────────────────────────────────────────────────────────
 
 model Portfolio {

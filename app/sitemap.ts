@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/portfolio`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITE_URL}/case-studies`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${SITE_URL}/products`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
   ]
 
@@ -62,5 +63,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB not available during build
   }
 
-  return [...staticRoutes, ...serviceRoutes, ...portfolioRoutes, ...blogRoutes]
+  // Dynamic product routes
+  let productRoutes: MetadataRoute.Sitemap = []
+  try {
+    const products = await prisma.product.findMany({
+      where: { active: true },
+      select: { slug: true, updatedAt: true },
+    })
+    productRoutes = products.map((p: { slug: string; updatedAt: Date }) => ({
+      url: `${SITE_URL}/products/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }))
+  } catch {
+    // DB not available during build
+  }
+
+  return [...staticRoutes, ...serviceRoutes, ...portfolioRoutes, ...blogRoutes, ...productRoutes]
 }

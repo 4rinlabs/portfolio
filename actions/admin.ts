@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { ServiceSchema, PortfolioSchema, BlogPostSchema } from '@/lib/schemas'
+import { ServiceSchema, PortfolioSchema, BlogPostSchema, ProductSchema } from '@/lib/schemas'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -423,6 +423,165 @@ export async function deleteBlogPostAction(formData: FormData): Promise<void> {
   revalidatePath('/blog')
   if (p) revalidatePath(`/blog/${p.slug}`)
   revalidatePath('/admin/blog')
+}
+
+// ─── Products ─────────────────────────────────────────────────────────────────
+
+export async function createProductAction(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  await requireAuth()
+
+  const tagsRaw = (formData.get('tags') as string) ?? ''
+  const tags = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean)
+
+  const galleryRaw = (formData.get('gallery') as string) ?? ''
+  const gallery = galleryRaw.split(',').map((g) => g.trim()).filter(Boolean)
+
+  const raw = {
+    name: formData.get('name') as string,
+    slug: formData.get('slug') as string,
+    tagline: formData.get('tagline') as string,
+    description: formData.get('description') as string,
+    coverImage: (formData.get('coverImage') as string) || undefined,
+    tags: tagsRaw,
+    category: (formData.get('category') as string) || undefined,
+    productUrl: (formData.get('productUrl') as string) || undefined,
+    githubUrl: (formData.get('githubUrl') as string) || undefined,
+    featured: formData.get('featured') === 'true',
+    active: formData.get('active') !== 'false',
+    order: Number(formData.get('order') ?? 0),
+    seoTitle: (formData.get('seoTitle') as string) || undefined,
+    seoDescription: (formData.get('seoDescription') as string) || undefined,
+  }
+
+  const parsed = ProductSchema.safeParse(raw)
+  if (!parsed.success) {
+    return { success: false, errors: parsed.error.flatten().fieldErrors as Record<string, string[]> }
+  }
+
+  const existing = await prisma.product.findUnique({ where: { slug: parsed.data.slug } })
+  if (existing) {
+    return { success: false, errors: { slug: ['This slug is already in use'] } }
+  }
+
+  const product = await prisma.product.create({
+    data: {
+      name: parsed.data.name,
+      slug: parsed.data.slug,
+      tagline: parsed.data.tagline,
+      description: parsed.data.description,
+      coverImage: parsed.data.coverImage || '',
+      gallery,
+      tags,
+      category: parsed.data.category || null,
+      productUrl: parsed.data.productUrl || null,
+      githubUrl: parsed.data.githubUrl || null,
+      featured: parsed.data.featured,
+      active: parsed.data.active,
+      order: parsed.data.order,
+      seoTitle: parsed.data.seoTitle || null,
+      seoDescription: parsed.data.seoDescription || null,
+    },
+  })
+
+  revalidatePath('/products')
+  revalidatePath('/')
+  revalidatePath('/admin/products')
+  return { success: true, message: 'Product created', id: product.id }
+}
+
+export async function updateProductAction(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  await requireAuth()
+
+  const id = formData.get('id') as string
+  if (!id) return { success: false, message: 'Missing ID' }
+
+  const tagsRaw = (formData.get('tags') as string) ?? ''
+  const tags = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean)
+
+  const galleryRaw = (formData.get('gallery') as string) ?? ''
+  const gallery = galleryRaw.split(',').map((g) => g.trim()).filter(Boolean)
+
+  const raw = {
+    name: formData.get('name') as string,
+    slug: formData.get('slug') as string,
+    tagline: formData.get('tagline') as string,
+    description: formData.get('description') as string,
+    coverImage: (formData.get('coverImage') as string) || undefined,
+    tags: tagsRaw,
+    category: (formData.get('category') as string) || undefined,
+    productUrl: (formData.get('productUrl') as string) || undefined,
+    githubUrl: (formData.get('githubUrl') as string) || undefined,
+    featured: formData.get('featured') === 'true',
+    active: formData.get('active') !== 'false',
+    order: Number(formData.get('order') ?? 0),
+    seoTitle: (formData.get('seoTitle') as string) || undefined,
+    seoDescription: (formData.get('seoDescription') as string) || undefined,
+  }
+
+  const parsed = ProductSchema.safeParse(raw)
+  if (!parsed.success) {
+    return { success: false, errors: parsed.error.flatten().fieldErrors as Record<string, string[]> }
+  }
+
+  const existing = await prisma.product.findFirst({
+    where: { slug: parsed.data.slug, NOT: { id } },
+  })
+  if (existing) {
+    return { success: false, errors: { slug: ['This slug is already in use'] } }
+  }
+
+  await prisma.product.update({
+    where: { id },
+    data: {
+      name: parsed.data.name,
+      slug: parsed.data.slug,
+      tagline: parsed.data.tagline,
+      description: parsed.data.description,
+      coverImage: parsed.data.coverImage || '',
+      gallery,
+      tags,
+      category: parsed.data.category || null,
+      productUrl: parsed.data.productUrl || null,
+      githubUrl: parsed.data.githubUrl || null,
+      featured: parsed.data.featured,
+      active: parsed.data.active,
+      order: parsed.data.order,
+      seoTitle: parsed.data.seoTitle || null,
+      seoDescription: parsed.data.seoDescription || null,
+    },
+  })
+
+  revalidatePath('/products')
+  revalidatePath(`/products/${parsed.data.slug}`)
+  revalidatePath('/')
+  revalidatePath('/admin/products')
+  return { success: true, message: 'Product updated' }
+}
+
+export async function deleteProductAction(formData: FormData): Promise<void> {
+  await requireAuth()
+  const id = formData.get('id') as string
+  if (!id) return
+  const p = await prisma.product.findUnique({ where: { id }, select: { slug: true } })
+  await prisma.product.delete({ where: { id } })
+  revalidatePath('/products')
+  if (p) revalidatePath(`/products/${p.slug}`)
+  revalidatePath('/')
+  revalidatePath('/admin/products')
+}
+
+export async function toggleProductActiveAction(formData: FormData): Promise<void> {
+  await requireAuth()
+  const id = formData.get('id') as string
+  const active = formData.get('active') === 'true'
+  await prisma.product.update({ where: { id }, data: { active: !active } })
+  revalidatePath('/admin/products')
 }
 
 // ─── Leads ────────────────────────────────────────────────────────────────────

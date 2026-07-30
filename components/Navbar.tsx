@@ -156,6 +156,7 @@ const LINKS = [
   { id: 'home', label: 'Home' },
   { id: 'services', label: 'Services' },
   { id: 'portfolio', label: 'Portfolio' },
+  { id: 'products', label: 'Products' },
   { id: 'blog', label: 'Blog' },
   { id: 'faq', label: 'FAQ' },
   { id: 'contact', label: 'Contact' },

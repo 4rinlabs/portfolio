@@ -14,6 +14,7 @@ async function getDashboardData() {
       totalLeads,
       unreadLeads,
       totalProjects,
+      totalProducts,
       totalServices,
       publishedPosts,
       draftPosts,
@@ -24,6 +25,7 @@ async function getDashboardData() {
       prisma.contactLead.count(),
       prisma.contactLead.count({ where: { read: false } }),
       prisma.portfolio.count(),
+      prisma.product.count({ where: { active: true } }),
       prisma.service.count(),
       prisma.blogPost.count({ where: { published: true } }),
       prisma.blogPost.count({ where: { published: false } }),
@@ -48,6 +50,7 @@ async function getDashboardData() {
       totalLeads,
       unreadLeads,
       totalProjects,
+      totalProducts,
       totalServices,
       publishedPosts,
       draftPosts,
@@ -60,6 +63,7 @@ async function getDashboardData() {
       totalLeads: 0,
       unreadLeads: 0,
       totalProjects: 0,
+      totalProducts: 0,
       totalServices: 0,
       publishedPosts: 0,
       draftPosts: 0,
@@ -92,6 +96,13 @@ export default async function AdminDashboard() {
       accent: false,
     },
     {
+      label: 'Products',
+      value: data.totalProducts,
+      sub: 'Active products',
+      href: '/admin/products',
+      accent: false,
+    },
+    {
       label: 'Projects',
       value: data.totalProjects,
       sub: 'Portfolio items',
@@ -109,6 +120,7 @@ export default async function AdminDashboard() {
 
   const quickActions = [
     { href: '/admin/services/new', label: '+ New Service' },
+    { href: '/admin/products/new', label: '+ New Product' },
     { href: '/admin/portfolio/new', label: '+ New Project' },
     { href: '/admin/blog/new', label: '+ New Post' },
     { href: '/admin/leads', label: 'View Leads' },
