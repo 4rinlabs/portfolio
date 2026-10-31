@@ -9,6 +9,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.4rinlabs.com'
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -57,11 +59,11 @@ export default async function BlogPostPage({ params }: Props) {
     image: post.coverImage,
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt.toISOString(),
-    author: { '@type': 'Organization', name: '4RinLabs', url: process.env.NEXT_PUBLIC_SITE_URL },
+    author: { '@type': 'Organization', name: '4RinLabs', url: SITE_URL },
     publisher: {
       '@type': 'Organization',
       name: '4RinLabs',
-      logo: { '@type': 'ImageObject', url: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png` },
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
     },
   }
 

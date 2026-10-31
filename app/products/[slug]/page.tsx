@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react'
 import type { Metadata } from 'next'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.4rinlabs.com'
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -84,11 +86,11 @@ export default async function ProductPage({ params }: Props) {
     name: product.name,
     description: product.tagline,
     applicationCategory: product.category ?? 'WebApplication',
-    url: product.productUrl ?? `${process.env.NEXT_PUBLIC_SITE_URL}/products/${slug}`,
+    url: product.productUrl ?? `${SITE_URL}/products/${slug}`,
     author: {
       '@type': 'Organization',
       name: '4RinLabs',
-      url: process.env.NEXT_PUBLIC_SITE_URL,
+      url: SITE_URL,
     },
   }
 

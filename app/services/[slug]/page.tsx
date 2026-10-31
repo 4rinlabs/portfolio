@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.4rinlabs.com'
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -48,9 +50,9 @@ export default async function ServicePage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Services', item: `${process.env.NEXT_PUBLIC_SITE_URL}/services` },
-      { '@type': 'ListItem', position: 3, name: service.name, item: `${process.env.NEXT_PUBLIC_SITE_URL}/services/${slug}` },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: `${SITE_URL}/services` },
+      { '@type': 'ListItem', position: 3, name: service.name, item: `${SITE_URL}/services/${slug}` },
     ],
   }
 
@@ -59,8 +61,8 @@ export default async function ServicePage({ params }: Props) {
     '@type': 'Service',
     name: service.name,
     description: service.shortDescription,
-    provider: { '@type': 'Organization', name: '4RinLabs', url: process.env.NEXT_PUBLIC_SITE_URL },
-    url: `${process.env.NEXT_PUBLIC_SITE_URL}/services/${slug}`,
+    provider: { '@type': 'Organization', name: '4RinLabs', url: SITE_URL },
+    url: `${SITE_URL}/services/${slug}`,
   }
 
   return (
