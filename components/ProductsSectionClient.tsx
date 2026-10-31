@@ -96,7 +96,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             aria-label={`Learn more about ${product.name}`}
             className="portfolio-card-cta btn-glitch inline-flex items-center gap-1.5 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
           >
-            Learn more
+            Learn more <span className="sr-only">about {product.name}</span>
             <ArrowRight size={12} className="text-lime" aria-hidden />
           </Link>
 
@@ -108,7 +108,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
               aria-label={`Visit ${product.name} live site`}
               className="portfolio-card-cta btn-glitch inline-flex items-center gap-1.5 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
             >
-              Live
+              Live <span className="sr-only">{product.name} site</span>
               <ExternalLink size={12} className="text-lime" aria-hidden />
             </a>
           )}
