@@ -63,21 +63,13 @@ function ProjectCard({
   thumbnail,
   index,
 }: (typeof PROJECTS)[number] & { index: number }) {
-  const open = () => window.open(url, '_blank', 'noopener,noreferrer')
-
   return (
-    <motion.article
+    <motion.a
       {...fadeIn}
       transition={{ ...fadeIn.transition, delay: index * 0.08 }}
-      role="link"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          open()
-        }
-      }}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
       className="portfolio-card group flex h-full min-h-[420px] cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm md:min-h-[440px]"
     >
       <div
@@ -113,7 +105,7 @@ function ProjectCard({
           <ExternalLink size={14} className="text-lime" aria-hidden />
         </span>
       </div>
-    </motion.article>
+    </motion.a>
   )
 }
 
