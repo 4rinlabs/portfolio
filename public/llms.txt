@@ -5,90 +5,48 @@
 ## Company
 
 - **Name:** 4RinLabs
-- **Website:** https://www.4rinlabs.com
-- **Email:** 4rinlabs@gmail.com
+- **Website:** [https://www.4rinlabs.com](https://www.4rinlabs.com)
+- **Email:** [4rinlabs@gmail.com](mailto:4rinlabs@gmail.com)
 - **Type:** Software Development Company / Creative Digital Studio
 
-## Core Services
+## Services
 
-### AI Development
-Custom AI solutions built for production. Services include:
-- Large Language Model (LLM) integrations (OpenAI, Anthropic Claude, Google Gemini)
-- RAG (Retrieval-Augmented Generation) systems
-- AI Agents and multi-agent architectures
-- Workflow automation with AI
-- Computer vision projects
-- Chatbots and conversational AI
-- Prompt engineering and model fine-tuning
-
-### Custom Software Development
-Bespoke software engineered around client workflows:
-- Internal tools and dashboards
-- Enterprise software systems
-- API development and integrations
-- Database architecture and optimization
-
-### SaaS Development
-End-to-end SaaS platform development:
-- Multi-tenant architecture
-- Subscription billing (Stripe integration)
-- User management and authentication
-- Analytics and reporting dashboards
-- MVP to enterprise scale
-
-### Web Development
-Full-spectrum web development:
-- Static and dynamic websites
-- Marketing and landing pages
-- E-commerce stores
-- Portfolio sites
-- Next.js, React, TypeScript, Tailwind CSS
-
-### Mobile App Development
-iOS and Android application development:
-- React Native cross-platform apps
-- Native mobile development
-- App Store and Play Store submissions
-- Push notifications, offline-first, performance optimization
-
-### WhatsApp CRM
-WhatsApp Business API solutions:
-- Automated lead qualification flows
-- Broadcast messaging systems
-- CRM integrations (HubSpot, custom)
-- Support ticketing via WhatsApp
-
-### Digital Marketing
-Performance-driven digital marketing:
-- Social media management
-- Meta and Google Ads campaigns
-- SEO and content strategy
-- Brand growth consulting
-
-## Technology Stack
-
-Frontend: Next.js, React, TypeScript, Tailwind CSS, Framer Motion
-Backend: Node.js, TypeScript, PostgreSQL, Prisma ORM
-AI/ML: OpenAI, Anthropic, LangChain, vector databases (Pinecone, pgvector)
-Mobile: React Native
-Cloud: Vercel, AWS, GCP
-Auth: Auth.js (NextAuth)
-
-## Contact
-
-- WhatsApp: https://wa.me/919961386952
-- Instagram: https://www.instagram.com/4rinlabs
-- LinkedIn: https://www.linkedin.com/company/4rinlabs
-- Email: 4rinlabs@gmail.com
+- [AI Development](https://www.4rinlabs.com/services/ai-development): Custom AI solutions built for production, LLM integrations (OpenAI, Claude, Gemini), RAG systems, autonomous agents, and workflow automation.
+- [Custom Software Development](https://www.4rinlabs.com/services/custom-software-development): Bespoke internal tools, dashboards, enterprise systems, and API development engineered around client workflows.
+- [SaaS Development](https://www.4rinlabs.com/services/saas-development): End-to-end multi-tenant SaaS platforms with subscription billing, user authentication, and analytics dashboards.
+- [Web Development](https://www.4rinlabs.com/services/web-development): Modern web applications, marketing pages, and e-commerce built with Next.js, React, TypeScript, and Tailwind CSS.
+- [Mobile App Development](https://www.4rinlabs.com/services/mobile-app-development): Cross-platform iOS and Android application development using React Native.
+- [WhatsApp CRM](https://www.4rinlabs.com/services/whatsapp-crm): WhatsApp Business API solutions, automated lead qualification, broadcasts, and CRM integrations.
+- [Digital Marketing](https://www.4rinlabs.com/services/digital-marketing): Performance-driven marketing, paid ads (Meta and Google), content strategy, and SEO.
 
 ## Key Pages
 
-- Home: https://www.4rinlabs.com
-- Services: https://www.4rinlabs.com/services
-- Portfolio: https://www.4rinlabs.com/portfolio
-- Blog: https://www.4rinlabs.com/blog
-- Contact: https://www.4rinlabs.com/contact
-- About: https://www.4rinlabs.com/about
+- [Home](https://www.4rinlabs.com): 4RinLabs official website and company overview.
+- [Services](https://www.4rinlabs.com/services): Complete directory of software engineering and digital services.
+- [Portfolio](https://www.4rinlabs.com/portfolio): Case studies and selected client projects.
+- [Blog](https://www.4rinlabs.com/blog): Technical articles, engineering insights, and AI developments.
+- [Contact](https://www.4rinlabs.com/contact): Inquire about new projects and get in touch.
+
+## Technology Stack
+
+- **Frontend:** Next.js, React, TypeScript, Tailwind CSS, Framer Motion
+- **Backend:** Node.js, TypeScript, PostgreSQL, Prisma ORM
+- **AI/ML:** OpenAI, Anthropic Claude, Google Gemini, LangChain, vector databases (pgvector, Pinecone)
+- **Mobile:** React Native (iOS & Android)
+- **Cloud & DevOps:** Vercel, AWS, GCP
+- **Authentication:** Auth.js (NextAuth)
+
+## Contact & Socials
+
+- [WhatsApp](https://wa.me/919961386952): Direct messaging on WhatsApp
+- [LinkedIn](https://www.linkedin.com/company/4rinlabs): Company updates and professional network
+- [Instagram](https://www.instagram.com/4rinlabs): Design and studio highlights
+- [GitHub](https://github.com/4rinlabs): Open source projects and code repositories
+
+## Optional
+
+- [Sitemap](https://www.4rinlabs.com/sitemap.xml): XML sitemap of all indexed pages.
+- [Robots](https://www.4rinlabs.com/robots.txt): Web crawler directives.
 
 ## Frequently Asked Questions
 
