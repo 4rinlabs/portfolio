@@ -101,6 +101,7 @@ export default async function PortfolioPage() {
                       <div className="mt-5 flex items-center gap-3">
                         <Link
                           href={`/portfolio/${project.slug}`}
+                          aria-label={`View ${project.title} case study`}
                           className="portfolio-card-cta btn-glitch inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
                         >
                           Case study
@@ -110,6 +111,7 @@ export default async function PortfolioPage() {
                             href={project.projectUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={`Visit ${project.title} live site`}
                             className="portfolio-card-cta btn-glitch inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
                           >
                             Live site

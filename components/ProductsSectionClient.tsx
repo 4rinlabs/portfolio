@@ -93,6 +93,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
         <div className="mt-5 flex items-center gap-3">
           <Link
             href={`/products/${product.slug}`}
+            aria-label={`Learn more about ${product.name}`}
             className="portfolio-card-cta btn-glitch inline-flex items-center gap-1.5 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
           >
             Learn more
@@ -104,6 +105,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
               href={product.productUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Visit ${product.name} live site`}
               className="portfolio-card-cta btn-glitch inline-flex items-center gap-1.5 rounded-lg border px-4 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.2em] transition hover:border-lime/50 hover:shadow-lime-glow"
             >
               Live

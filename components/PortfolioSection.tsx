@@ -70,6 +70,7 @@ function ProjectCard({
       href={url}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={`Visit ${title} website`}
       className="portfolio-card group flex h-full min-h-[420px] cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm md:min-h-[440px]"
     >
       <div
