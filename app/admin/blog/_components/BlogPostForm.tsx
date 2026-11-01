@@ -89,7 +89,7 @@ export function BlogPostForm({ post }: BlogPostFormProps) {
             name="coverImage"
             label="Cover image"
             defaultValue={post?.coverImage ?? ''}
-            hint="Recommended 1200×630px · max 5 MB"
+            hint="Recommended 1200×630px · max 4 MB"
           />
         </div>
 

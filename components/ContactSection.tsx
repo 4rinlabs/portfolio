@@ -4,8 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useActionState, useEffect, useRef } from 'react'
 import { CheckCircle2, Loader2 } from 'lucide-react'
 import { BsInstagram, BsLinkedin, BsWhatsapp } from 'react-icons/bs'
+import Script from 'next/script'
 import { MagneticButton } from './MagneticButton'
 import { submitContact, type ContactActionState } from '@/actions/contact'
+
+const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
 
 const social = [
   { href: 'https://wa.me/919961386952', label: 'WhatsApp', Icon: BsWhatsapp },
@@ -64,11 +68,16 @@ export function ContactSection() {
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset()
+    } else if (state.message) {
+      // If verification failed or errored, reset Turnstile challenge
+      const win = typeof window !== 'undefined' ? (window as unknown as { turnstile?: { reset: () => void } }) : undefined
+      win?.turnstile?.reset()
     }
-  }, [state.success])
+  }, [state.success, state.message])
 
   return (
     <section id="contact" className="scroll-mt-24 bg-charcoal py-24 text-white md:py-32">
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
       <div className="site-container">
         <div className="grid gap-14 lg:grid-cols-[1fr_300px] xl:grid-cols-[1.15fr_280px] xl:gap-20">
           <motion.div
@@ -120,6 +129,28 @@ export function ContactSection() {
                         </motion.div>
                       )}
                     </AnimatePresence>
+
+                    {/* Passive Honeypot Field */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '-9999px',
+                        opacity: 0,
+                        height: 0,
+                        width: 0,
+                        pointerEvents: 'none',
+                      }}
+                      aria-hidden="true"
+                    >
+                      <label htmlFor="b_website_url">Website URL (leave blank)</label>
+                      <input
+                        id="b_website_url"
+                        name="b_website_url"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
 
                     <div>
                       <label className="sr-only" htmlFor="c-name">
@@ -205,6 +236,16 @@ export function ContactSection() {
                           {state.errors.message[0]}
                         </p>
                       )}
+                    </div>
+
+                    {/* Cloudflare Turnstile Challenge Widget */}
+                    <div className="my-1 min-h-[65px]">
+                      <div
+                        className="cf-turnstile"
+                        data-sitekey={TURNSTILE_SITE_KEY}
+                        data-action="contact_form"
+                        data-theme="dark"
+                      />
                     </div>
 
                     <MagneticButton

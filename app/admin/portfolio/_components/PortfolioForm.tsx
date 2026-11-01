@@ -81,7 +81,7 @@ export function PortfolioForm({ project }: PortfolioFormProps) {
             name="coverImage"
             label="Cover image"
             defaultValue={project?.coverImage}
-            hint="Recommended: 1200×630px, JPG/PNG/WebP, max 5 MB"
+            hint="Recommended: 1200×630px, JPG/PNG/WebP, max 4 MB"
           />
         </div>
 

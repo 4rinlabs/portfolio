@@ -77,7 +77,7 @@ export function ProductForm({ product }: { product?: Product }) {
             name="coverImage"
             label="Cover image"
             defaultValue={product?.coverImage ?? ''}
-            hint="Recommended: 1200×630px, JPG/PNG/WebP, max 5 MB"
+            hint="Recommended: 1200×630px, JPG/PNG/WebP, max 4 MB"
           />
         </div>
 

@@ -19,12 +19,13 @@ export function ImageUpload({ name, label, defaultValue, hint }: ImageUploadProp
   const [url, setUrl] = useState(defaultValue ?? '')
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setError('Please select an image file.')
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setError('Please select a JPEG, PNG, or WebP image.')
       return
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image must be under 5 MB.')
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Image must be under 4 MB.')
       return
     }
     setError('')
@@ -39,12 +40,15 @@ export function ImageUpload({ name, label, defaultValue, hint }: ImageUploadProp
       fd.append('file', file)
 
       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-      if (!res.ok) throw new Error('Upload failed')
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error || 'Upload failed')
+      }
       const { url: uploaded } = (await res.json()) as { url: string }
       setUrl(uploaded)
       setPreview(uploaded)
-    } catch {
-      setError('Upload failed. Please try again.')
+    } catch (err: any) {
+      setError(err?.message || 'Upload failed. Please try again.')
       setPreview(defaultValue ?? '')
       setUrl(defaultValue ?? '')
     } finally {
@@ -157,7 +161,7 @@ export function ImageUpload({ name, label, defaultValue, hint }: ImageUploadProp
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         style={{ display: 'none' }}
         onChange={(e) => {
           const f = e.target.files?.[0]
