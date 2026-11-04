@@ -1,3 +1,5 @@
+import { safeJsonLd } from '@/lib/safe-json-ld'
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.4rinlabs.com'
 
 const organizationSchema = {
@@ -101,19 +103,19 @@ export function StructuredData() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(servicesSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(faqSchema) }}
       />
     </>
   )

@@ -21,7 +21,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic service routes
   let serviceRoutes: MetadataRoute.Sitemap = []
   try {
-    const services = await prisma.service.findMany({ select: { slug: true, updatedAt: true } })
+    const services = await prisma.service.findMany({
+      where: { active: true },
+      select: { slug: true, updatedAt: true },
+    })
     serviceRoutes = services.map((s: { slug: string; updatedAt: Date }) => ({
       url: `${SITE_URL}/services/${s.slug}`,
       lastModified: s.updatedAt,

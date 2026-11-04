@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/metadata'
+import { safeJsonLd } from '@/lib/safe-json-ld'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -15,7 +16,15 @@ type Props = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const service = await prisma.service.findUnique({ where: { slug } })
+    const service = await prisma.service.findFirst({
+      where: { slug, active: true },
+      select: {
+        name: true,
+        shortDescription: true,
+        seoTitle: true,
+        seoDescription: true,
+      },
+    })
     if (!service) return {}
     return buildMetadata({
       title: service.seoTitle ?? service.name,
@@ -29,7 +38,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   try {
-    const services = await prisma.service.findMany({ select: { slug: true } })
+    const services = await prisma.service.findMany({
+      where: { active: true },
+      select: { slug: true },
+    })
     return services.map((s: { slug: string }) => ({ slug: s.slug }))
   } catch {
     return []
@@ -40,7 +52,14 @@ export default async function ServicePage({ params }: Props) {
   const { slug } = await params
   let service
   try {
-    service = await prisma.service.findUnique({ where: { slug } })
+    service = await prisma.service.findFirst({
+      where: { slug, active: true },
+      select: {
+        name: true,
+        shortDescription: true,
+        longDescription: true,
+      },
+    })
   } catch {
     notFound()
   }
@@ -67,8 +86,8 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <ThemeProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(serviceSchema) }} />
       <div className="app-shell relative min-h-screen font-sans antialiased">
         <Navbar />
         <main className="pt-[4.5rem]">

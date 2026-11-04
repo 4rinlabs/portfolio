@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { ProductForm } from '../../_components/ProductForm'
@@ -14,12 +15,19 @@ export default async function EditProductPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect('/admin/login')
 
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
+
   const { id } = await params
   const product = await prisma.product.findUnique({ where: { id } })
   if (!product) notFound()
 
   return (
-    <AdminShell email={session.user.email}>
+    <AdminShell email={user.email} role={user.role}>
       <div style={{ padding: 'clamp(16px, 4vw, 40px)', maxWidth: '860px' }}>
         <AdminHeader title={`Edit: ${product.name}`} />
         <ProductForm product={product} />

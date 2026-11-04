@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/metadata'
+import { sanitizeExternalUrl } from '@/lib/safe-url'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -148,9 +149,9 @@ export default async function ProductsPage() {
                             Learn more <span className="sr-only">about {product.name}</span>
                             <ArrowRight size={12} className="text-lime" aria-hidden />
                           </Link>
-                          {product.productUrl && (
+                          {sanitizeExternalUrl(product.productUrl) && (
                             <a
-                              href={product.productUrl}
+                              href={sanitizeExternalUrl(product.productUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`Visit ${product.name} live site`}

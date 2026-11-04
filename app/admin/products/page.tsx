@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { deleteProductAction, toggleProductActiveAction } from '@/actions/admin'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -18,6 +19,13 @@ export default async function AdminProductsPage({
 }) {
   const session = await auth()
   if (!session) redirect('/admin/login')
+
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
 
   const { q } = await searchParams
 
@@ -63,7 +71,7 @@ export default async function AdminProductsPage({
   }
 
   return (
-    <AdminShell email={session.user.email}>
+    <AdminShell email={user.email} role={user.role}>
       <div style={{ padding: 'clamp(16px, 4vw, 40px)' }}>
         <AdminHeader
           title="Products"
@@ -201,12 +209,14 @@ export default async function AdminProductsPage({
                     >
                       ↗
                     </Link>
-                    <form action={deleteProductAction}>
-                      <input type="hidden" name="id" value={product.id} />
-                      <button type="submit" style={{ padding: '7px 12px', background: 'rgba(255,50,50,0.08)', border: '1px solid rgba(255,50,50,0.2)', borderRadius: '8px', color: 'rgba(255,100,100,0.8)', fontSize: '11px', cursor: 'pointer' }}>
-                        Delete
-                      </button>
-                    </form>
+                    {user.role === 'ADMIN' && (
+                      <form action={deleteProductAction}>
+                        <input type="hidden" name="id" value={product.id} />
+                        <button type="submit" style={{ padding: '7px 12px', background: 'rgba(255,50,50,0.08)', border: '1px solid rgba(255,50,50,0.2)', borderRadius: '8px', color: 'rgba(255,100,100,0.8)', fontSize: '11px', cursor: 'pointer' }}>
+                          Delete
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </div>
               </div>

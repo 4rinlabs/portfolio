@@ -56,12 +56,14 @@ async function runPhase2Tests() {
       'Session with missing user ID returns 401',
     )
 
+    const currentAuthTime = Math.floor(Date.now() / 1000)
+
     // 1.3 ADMIN role in database is allowed
     ;(prisma.user as any).findUnique = async ({ where }: any) => {
-      if (where.id === 'admin-123') return { id: 'admin-123', email: 'admin@4rinlabs.com', role: 'ADMIN' }
+      if (where.id === 'admin-123') return { id: 'admin-123', email: 'admin@4rinlabs.com', role: 'ADMIN', tokenVersion: 1 }
       return null
     }
-    const adminResult = await getAuthorizedUploadUser({ user: { id: 'admin-123', role: 'ADMIN' } })
+    const adminResult = await getAuthorizedUploadUser({ user: { id: 'admin-123', role: 'ADMIN', authTime: currentAuthTime, tokenVersion: 1 } })
     assert(
       adminResult.authorized && adminResult.user.role === 'ADMIN',
       'ADMIN can upload',
@@ -69,10 +71,10 @@ async function runPhase2Tests() {
 
     // 1.4 EDITOR role in database is allowed
     ;(prisma.user as any).findUnique = async ({ where }: any) => {
-      if (where.id === 'editor-456') return { id: 'editor-456', email: 'editor@4rinlabs.com', role: 'EDITOR' }
+      if (where.id === 'editor-456') return { id: 'editor-456', email: 'editor@4rinlabs.com', role: 'EDITOR', tokenVersion: 1 }
       return null
     }
-    const editorResult = await getAuthorizedUploadUser({ user: { id: 'editor-456', role: 'EDITOR' } })
+    const editorResult = await getAuthorizedUploadUser({ user: { id: 'editor-456', role: 'EDITOR', authTime: currentAuthTime, tokenVersion: 1 } })
     assert(
       editorResult.authorized && editorResult.user.role === 'EDITOR',
       'EDITOR can upload',
@@ -80,10 +82,10 @@ async function runPhase2Tests() {
 
     // 1.5 Non-admin / non-editor roles are rejected with 403
     ;(prisma.user as any).findUnique = async ({ where }: any) => {
-      if (where.id === 'viewer-789') return { id: 'viewer-789', email: 'viewer@4rinlabs.com', role: 'VIEWER' }
+      if (where.id === 'viewer-789') return { id: 'viewer-789', email: 'viewer@4rinlabs.com', role: 'VIEWER', tokenVersion: 1 }
       return null
     }
-    const viewerResult = await getAuthorizedUploadUser({ user: { id: 'viewer-789', role: 'VIEWER' } })
+    const viewerResult = await getAuthorizedUploadUser({ user: { id: 'viewer-789', role: 'VIEWER', authTime: currentAuthTime, tokenVersion: 1 } })
     assert(
       !viewerResult.authorized && viewerResult.status === 403,
       'Other roles (e.g. VIEWER) are rejected with 403',
@@ -91,15 +93,15 @@ async function runPhase2Tests() {
 
     // 1.6 Deleted user (exists in JWT cookie but not in PostgreSQL) returns 401
     ;(prisma.user as any).findUnique = async () => null
-    const deletedResult = await getAuthorizedUploadUser({ user: { id: 'deleted-user-id', role: 'ADMIN' } })
+    const deletedResult = await getAuthorizedUploadUser({ user: { id: 'deleted-user-id', role: 'ADMIN', authTime: currentAuthTime, tokenVersion: 1 } })
     assert(
       !deletedResult.authorized && deletedResult.status === 401,
       'Deleted user is rejected with 401 even if JWT claims ADMIN',
     )
 
     // 1.7 Stale JWT role cannot override current database role
-    ;(prisma.user as any).findUnique = async () => ({ id: 'demoted-user', email: 'demoted@4rinlabs.com', role: 'GUEST' })
-    const staleResult = await getAuthorizedUploadUser({ user: { id: 'demoted-user', role: 'ADMIN' } })
+    ;(prisma.user as any).findUnique = async () => ({ id: 'demoted-user', email: 'demoted@4rinlabs.com', role: 'GUEST', tokenVersion: 1 })
+    const staleResult = await getAuthorizedUploadUser({ user: { id: 'demoted-user', role: 'ADMIN', authTime: currentAuthTime, tokenVersion: 1 } })
     assert(
       !staleResult.authorized && staleResult.status === 403,
       'Stale JWT role cannot override current database role (403)',
@@ -332,7 +334,7 @@ async function runPhase2Tests() {
   // 3.5 Invalid multipart requests return controlled error (400)
   setAuthGuardForTesting(() => ({
     authorized: true,
-    user: { id: 'admin-tester', email: 'admin@4rinlabs.com', role: 'ADMIN' },
+    user: { id: 'admin-tester', email: 'admin@4rinlabs.com', role: 'ADMIN', tokenVersion: 1 },
   }))
 
   const mockRedisLimiter = {

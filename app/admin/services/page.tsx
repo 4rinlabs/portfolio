@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { deleteServiceAction, toggleServiceActiveAction } from '@/actions/admin'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -17,6 +18,13 @@ export default async function AdminServicesPage({
 }) {
   const session = await auth()
   if (!session) redirect('/admin/login')
+
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
 
   const { q } = await searchParams
 
@@ -56,7 +64,7 @@ export default async function AdminServicesPage({
   }
 
   return (
-    <AdminShell email={session.user.email}>
+    <AdminShell email={user.email} role={user.role}>
       <div
         style={{
           padding: 'clamp(16px, 4vw, 40px)',
@@ -68,7 +76,6 @@ export default async function AdminServicesPage({
           action={{ href: '/admin/services/new', label: '+ New Service' }}
         >
           {/* Search */}
-          
           <form
             method="GET"
             style={{
@@ -78,38 +85,37 @@ export default async function AdminServicesPage({
               width: '100%',
             }}
           >
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search..."
-            style={{
-              flex: '1 1 100%',
-              padding: '8px 14px',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '13px',
-              outline: 'none',
-            }}
-          />
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search..."
+              style={{
+                flex: '1 1 100%',
+                padding: '8px 14px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '13px',
+                outline: 'none',
+              }}
+            />
 
-          <button
-            type="submit"
-            style={{
-              padding: '8px 14px',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: '12px',
-              cursor: 'pointer',
-            }}
-          >
-            Search
-          </button>
-            
-        </form>
+            <button
+              type="submit"
+              style={{
+                padding: '8px 14px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                color: 'rgba(255,255,255,0.7)',
+                fontSize: '12px',
+                cursor: 'pointer',
+              }}
+            >
+              Search
+            </button>
+          </form>
         </AdminHeader>
 
         {services.length === 0 ? (
@@ -286,24 +292,26 @@ export default async function AdminServicesPage({
                     ↗
                   </Link>
 
-                  <form action={deleteServiceAction}>
-                    <input type="hidden" name="id" value={svc.id} />
-                    <button
-                      type="submit"
-                      style={{
-                        padding: '8px 12px',
-                        background: 'rgba(255,50,50,0.08)',
-                        border: '1px solid rgba(255,50,50,0.2)',
-                        borderRadius: '8px',
-                        color: 'rgba(255,100,100,0.8)',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </form>
+                  {user.role === 'ADMIN' && (
+                    <form action={deleteServiceAction}>
+                      <input type="hidden" name="id" value={svc.id} />
+                      <button
+                        type="submit"
+                        style={{
+                          padding: '8px 12px',
+                          background: 'rgba(255,50,50,0.08)',
+                          border: '1px solid rgba(255,50,50,0.2)',
+                          borderRadius: '8px',
+                          color: 'rgba(255,100,100,0.8)',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             ))}

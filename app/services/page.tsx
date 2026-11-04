@@ -14,22 +14,23 @@ export const metadata: Metadata = buildMetadata({
 })
 
 export default async function ServicesPage() {
-  let services: { id: string; name: string; slug: string; shortDescription: string; icon: string | null }[] = []
+  let services: { id: string; name: string; slug: string; shortDescription: string }[] = []
   try {
     services = await prisma.service.findMany({
-      select: { id: true, name: true, slug: true, shortDescription: true, icon: true },
+      where: { active: true },
+      select: { id: true, name: true, slug: true, shortDescription: true },
       orderBy: { order: 'asc' },
     })
   } catch {
     // Fallback to static if DB unavailable
     services = [
-      { id: '1', name: 'AI Development', slug: 'ai-development', shortDescription: 'Custom AI solutions, LLM integrations, RAG systems, AI agents, and intelligent automation.', icon: null },
-      { id: '2', name: 'Custom Software Development', slug: 'custom-software-development', shortDescription: 'Bespoke software solutions engineered around your workflows and business logic.', icon: null },
-      { id: '3', name: 'SaaS Development', slug: 'saas-development', shortDescription: 'End-to-end SaaS platform development from MVP to enterprise-ready product.', icon: null },
-      { id: '4', name: 'Web Development', slug: 'web-development', shortDescription: 'From brand-sharp marketing sites to complex product interfaces — pixel-perfect execution.', icon: null },
-      { id: '5', name: 'Mobile App Development', slug: 'mobile-app-development', shortDescription: 'Custom Android and iOS applications with intuitive UX, API integrations, and performance.', icon: null },
-      { id: '6', name: 'WhatsApp CRM', slug: 'whatsapp-crm', shortDescription: 'WhatsApp automation, lead management, broadcast messaging, and CRM integration.', icon: null },
-      { id: '7', name: 'Digital Marketing', slug: 'digital-marketing', shortDescription: 'Social media marketing, content strategy, ad campaigns, and performance marketing.', icon: null },
+      { id: '1', name: 'AI Development', slug: 'ai-development', shortDescription: 'Custom AI solutions, LLM integrations, RAG systems, AI agents, and intelligent automation.' },
+      { id: '2', name: 'Custom Software Development', slug: 'custom-software-development', shortDescription: 'Bespoke software solutions engineered around your workflows and business logic.' },
+      { id: '3', name: 'SaaS Development', slug: 'saas-development', shortDescription: 'End-to-end SaaS platform development from MVP to enterprise-ready product.' },
+      { id: '4', name: 'Web Development', slug: 'web-development', shortDescription: 'From brand-sharp marketing sites to complex product interfaces — pixel-perfect execution.' },
+      { id: '5', name: 'Mobile App Development', slug: 'mobile-app-development', shortDescription: 'Custom Android and iOS applications with intuitive UX, API integrations, and performance.' },
+      { id: '6', name: 'WhatsApp CRM', slug: 'whatsapp-crm', shortDescription: 'WhatsApp automation, lead management, broadcast messaging, and CRM integration.' },
+      { id: '7', name: 'Digital Marketing', slug: 'digital-marketing', shortDescription: 'Social media marketing, content strategy, ad campaigns, and performance marketing.' },
     ]
   }
 

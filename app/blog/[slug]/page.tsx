@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/metadata'
+import { safeJsonLd } from '@/lib/safe-json-ld'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -16,7 +17,17 @@ type Props = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const post = await prisma.blogPost.findUnique({ where: { slug, published: true } })
+    const post = await prisma.blogPost.findUnique({
+      where: { slug, published: true },
+      select: {
+        title: true,
+        seoTitle: true,
+        excerpt: true,
+        seoDescription: true,
+        ogImage: true,
+        coverImage: true,
+      },
+    })
     if (!post) return {}
     return buildMetadata({
       title: post.seoTitle ?? post.title,
@@ -45,7 +56,19 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   let post
   try {
-    post = await prisma.blogPost.findUnique({ where: { slug, published: true } })
+    post = await prisma.blogPost.findUnique({
+      where: { slug, published: true },
+      select: {
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        publishedAt: true,
+        updatedAt: true,
+        tags: true,
+        readingTime: true,
+        content: true,
+      },
+    })
   } catch {
     notFound()
   }
@@ -69,7 +92,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <ThemeProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(articleSchema) }} />
       <div className="app-shell relative min-h-screen font-sans antialiased">
         <Navbar />
         <main className="pt-[4.5rem]">

@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin } from '@/lib/auth-guard'
 import { markLeadReadAction, markLeadUnreadAction, deleteLeadAction } from '@/actions/admin'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -17,6 +18,14 @@ export default async function LeadsPage({
 }) {
   const session = await auth()
   if (!session) redirect('/admin/login')
+
+  // Enforce ADMIN role against PostgreSQL database
+  let user
+  try {
+    user = await requireAdmin(session)
+  } catch {
+    redirect('/admin')
+  }
 
   const { q, status } = await searchParams
   const readFilter = status === 'read' ? true : status === 'unread' ? false : undefined
@@ -65,12 +74,12 @@ export default async function LeadsPage({
   ]
 
   return (
-    <AdminShell email={session.user.email}>
+    <AdminShell email={user.email} role={user.role}>
       <div
-  style={{
-    padding: '24px',
-  }}
->
+        style={{
+          padding: '24px',
+        }}
+      >
         <AdminHeader
           title="Contact Leads"
           subtitle={`${leads.length} lead${leads.length !== 1 ? 's' : ''}${unread > 0 ? ` · ${unread} unread` : ''}`}

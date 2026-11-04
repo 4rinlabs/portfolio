@@ -1,4 +1,6 @@
 import { buildMetadata } from '@/lib/metadata'
+import { safeJsonLd } from '@/lib/safe-json-ld'
+import { sanitizeExternalUrl } from '@/lib/safe-url'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -17,7 +19,16 @@ type Props = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const product = await prisma.product.findUnique({ where: { slug, active: true } })
+    const product = await prisma.product.findUnique({
+      where: { slug, active: true },
+      select: {
+        name: true,
+        tagline: true,
+        seoTitle: true,
+        seoDescription: true,
+        coverImage: true,
+      },
+    })
     if (!product) return {}
     return buildMetadata({
       title: product.seoTitle ?? product.name,
@@ -98,7 +109,7 @@ export default async function ProductPage({ params }: Props) {
     <ThemeProvider>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(productSchema) }}
       />
       <div className="app-shell relative min-h-screen font-sans antialiased">
         <Navbar />
@@ -221,9 +232,9 @@ export default async function ProductPage({ params }: Props) {
                   )}
 
                   <div className="flex flex-col gap-3">
-                    {product.productUrl && (
+                    {sanitizeExternalUrl(product.productUrl) && (
                       <a
-                        href={product.productUrl}
+                        href={sanitizeExternalUrl(product.productUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn-lime-primary btn-glitch flex items-center justify-center gap-2"
@@ -232,9 +243,9 @@ export default async function ProductPage({ params }: Props) {
                         <ExternalLink size={14} aria-hidden />
                       </a>
                     )}
-                    {product.githubUrl && (
+                    {sanitizeExternalUrl(product.githubUrl) && (
                       <a
-                        href={product.githubUrl}
+                        href={sanitizeExternalUrl(product.githubUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hero-btn hero-btn-secondary btn-glitch flex w-full items-center justify-center gap-2"

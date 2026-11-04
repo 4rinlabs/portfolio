@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/metadata'
+import { sanitizeExternalUrl } from '@/lib/safe-url'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -14,7 +15,16 @@ type Props = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
-    const project = await prisma.portfolio.findUnique({ where: { slug } })
+    const project = await prisma.portfolio.findUnique({
+      where: { slug },
+      select: {
+        title: true,
+        description: true,
+        seoTitle: true,
+        seoDescription: true,
+        coverImage: true,
+      },
+    })
     if (!project) return {}
     return buildMetadata({
       title: project.seoTitle ?? project.title,
@@ -42,7 +52,22 @@ export default async function PortfolioItemPage({ params }: Props) {
   try {
     project = await prisma.portfolio.findUnique({
       where: { slug },
-      include: { caseStudy: true },
+      select: {
+        title: true,
+        description: true,
+        coverImage: true,
+        client: true,
+        industry: true,
+        technologies: true,
+        projectUrl: true,
+        caseStudy: {
+          select: {
+            problem: true,
+            solution: true,
+            results: true,
+          },
+        },
+      },
     })
   } catch {
     notFound()
@@ -146,9 +171,9 @@ export default async function PortfolioItemPage({ params }: Props) {
                       </div>
                     </div>
                   )}
-                  {project.projectUrl && (
+                  {sanitizeExternalUrl(project.projectUrl) && (
                     <a
-                      href={project.projectUrl}
+                      href={sanitizeExternalUrl(project.projectUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-lime-primary btn-glitch mt-4 flex items-center justify-center gap-2"

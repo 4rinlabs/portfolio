@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { PortfolioForm } from '../../_components/PortfolioForm'
@@ -14,12 +15,19 @@ export default async function EditPortfolioPage({ params }: Props) {
   const session = await auth()
   if (!session) redirect('/admin/login')
 
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
+
   const { id } = await params
   const project = await prisma.portfolio.findUnique({ where: { id } })
   if (!project) notFound()
 
   return (
-    <AdminShell email={session.user.email}>
+    <AdminShell email={user.email} role={user.role}>
       <div style={{ padding: '40px', maxWidth: '860px' }}>
         <AdminHeader title={`Edit: ${project.title}`} />
         <PortfolioForm project={project} />

@@ -1,5 +1,5 @@
 import { resend } from '@/lib/resend'
-import { redis } from '@/lib/ratelimit'
+import { consumeRateLimit } from '@/lib/ratelimit'
 import crypto from 'crypto'
 
 export type ContactEmailPayload = {
@@ -55,7 +55,6 @@ export async function sendContactNotification(
 ): Promise<EmailDeliveryResult> {
   const from = process.env.EMAIL_FROM ?? '4RinLabs <hello@4rinlabs.com>'
   const notifyEmail = process.env.CONTACT_NOTIFY_EMAIL ?? '4rinlabs@gmail.com'
-  const isRedisAvailable = options?.redisAvailable !== false && Boolean(redis)
 
   const safeName = escapeHtml(payload.name)
   const safeEmail = escapeHtml(payload.email)
@@ -116,8 +115,8 @@ export async function sendContactNotification(
   // ==========================================
   // 2. CUSTOMER AUTO-REPLY (Idempotent & Protected)
   // ==========================================
-  // Rule A: If Redis is unavailable, suppress auto-replies to eliminate unmetered relay risk.
-  if (!isRedisAvailable || !redis) {
+  // If explicitly requested or rate limiter unavailable, suppress auto-replies
+  if (options?.redisAvailable === false) {
     suppressionReason = 'Suppressed: Distributed rate limiter unavailable; auto-reply disabled to prevent relay abuse.'
     console.warn(suppressionReason)
     return { adminNotificationSent: adminSent, customerAutoReplySent: false, suppressedReason: suppressionReason }
@@ -127,15 +126,12 @@ export async function sendContactNotification(
   const autoReplyLockKey = `autoreply:lock:${emailHash}`
   const TWO_HOURS_SECONDS = 7200
 
-  // Rule B: Acquire atomic lock for 2 hours.
-  // If key exists, customer received an auto-reply within 2 hours -> SUPPRESS.
+  // Acquire atomic auto-reply cooldown for 2 hours in PostgreSQL.
+  // If key exists and active within window, customer received an auto-reply within 2 hours -> SUPPRESS.
   try {
-    const lockAcquired = await redis.set(autoReplyLockKey, 'locked', {
-      nx: true,
-      ex: TWO_HOURS_SECONDS,
-    })
+    const autoReplyRes = await consumeRateLimit(autoReplyLockKey, 1, TWO_HOURS_SECONDS)
 
-    if (!lockAcquired) {
+    if (!autoReplyRes.allowed) {
       suppressionReason = 'Suppressed: An auto-reply was already dispatched to this recipient within the cooling window.'
       console.info(suppressionReason)
       return { adminNotificationSent: adminSent, customerAutoReplySent: false, suppressedReason: suppressionReason }

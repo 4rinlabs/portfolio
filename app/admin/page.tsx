@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { AdminShell } from '@/components/admin/AdminShell'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -8,7 +9,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Dashboard' }
 export const dynamic = 'force-dynamic'
 
-async function getDashboardData() {
+async function getDashboardData(isAdmin: boolean) {
   try {
     const [
       totalLeads,
@@ -22,18 +23,20 @@ async function getDashboardData() {
       recentPosts,
       recentProjects,
     ] = await Promise.all([
-      prisma.contactLead.count(),
-      prisma.contactLead.count({ where: { read: false } }),
+      isAdmin ? prisma.contactLead.count() : Promise.resolve(0),
+      isAdmin ? prisma.contactLead.count({ where: { read: false } }) : Promise.resolve(0),
       prisma.portfolio.count(),
       prisma.product.count({ where: { active: true } }),
       prisma.service.count(),
       prisma.blogPost.count({ where: { published: true } }),
       prisma.blogPost.count({ where: { published: false } }),
-      prisma.contactLead.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        select: { id: true, name: true, email: true, company: true, read: true, createdAt: true },
-      }),
+      isAdmin
+        ? prisma.contactLead.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            select: { id: true, name: true, email: true, company: true, read: true, createdAt: true },
+          })
+        : Promise.resolve([]),
       prisma.blogPost.findMany({
         orderBy: { createdAt: 'desc' },
         take: 4,
@@ -78,16 +81,28 @@ export default async function AdminDashboard() {
   const session = await auth()
   if (!session) redirect('/admin/login')
 
-  const data = await getDashboardData()
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
+
+  const isAdmin = user.role === 'ADMIN'
+  const data = await getDashboardData(isAdmin)
 
   const statCards = [
-    {
-      label: 'Unread Leads',
-      value: data.unreadLeads,
-      sub: `${data.totalLeads} total`,
-      href: '/admin/leads?status=unread',
-      accent: data.unreadLeads > 0,
-    },
+    ...(isAdmin
+      ? [
+          {
+            label: 'Unread Leads',
+            value: data.unreadLeads,
+            sub: `${data.totalLeads} total`,
+            href: '/admin/leads?status=unread',
+            accent: data.unreadLeads > 0,
+          },
+        ]
+      : []),
     {
       label: 'Services',
       value: data.totalServices,
@@ -123,12 +138,12 @@ export default async function AdminDashboard() {
     { href: '/admin/products/new', label: '+ New Product' },
     { href: '/admin/portfolio/new', label: '+ New Project' },
     { href: '/admin/blog/new', label: '+ New Post' },
-    { href: '/admin/leads', label: 'View Leads' },
+    ...(isAdmin ? [{ href: '/admin/leads', label: 'View Leads' }] : []),
   ]
 
   return (
-    <AdminShell email={session.user.email}>
-      <div style={{ padding: 'clamp(16px, 4vw, 40px)', }}>
+    <AdminShell email={user.email} role={user.role}>
+      <div style={{ padding: 'clamp(16px, 4vw, 40px)' }}>
         {/* Welcome */}
         <div style={{ marginBottom: '36px' }}>
           <h1
@@ -145,7 +160,7 @@ export default async function AdminDashboard() {
             Dashboard
           </h1>
           <p style={{ marginTop: '6px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-            Welcome back, {session.user.name ?? session.user.email}
+            Welcome back, {session.user.name ?? user.email}
           </p>
         </div>
 
@@ -247,132 +262,135 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Two-column activity */}
+        {/* Activity Section */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
+            gridTemplateColumns: isAdmin
+              ? 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))'
+              : '1fr',
             gap: '24px',
           }}
         >
-          {/* Recent leads */}
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '14px',
-              }}
-            >
-              <p
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.25em',
-                  color: 'rgba(255,255,255,0.3)',
-                  margin: 0,
-                }}
-              >
-                Recent Leads
-              </p>
-              <Link
-                href="/admin/leads"
-                style={{ fontSize: '12px', color: '#7fff00', textDecoration: 'none' }}
-              >
-                View all →
-              </Link>
-            </div>
-
-            {data.recentLeads.length === 0 ? (
+          {/* Recent leads: ADMIN only */}
+          {isAdmin && (
+            <div>
               <div
                 style={{
-                  padding: '32px',
-                  textAlign: 'center',
-                  background: '#0a0a0a',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.25)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '14px',
                 }}
               >
-                No leads yet
+                <p
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.25em',
+                    color: 'rgba(255,255,255,0.3)',
+                    margin: 0,
+                  }}
+                >
+                  Recent Leads
+                </p>
+                <Link
+                  href="/admin/leads"
+                  style={{ fontSize: '12px', color: '#7fff00', textDecoration: 'none' }}
+                >
+                  View all →
+                </Link>
               </div>
-            ) : (
-              <div style={{ display: 'grid', gap: '8px' }}>
-                {data.recentLeads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      background: '#0a0a0a',
-                      border: `1px solid ${!lead.read ? 'rgba(127,255,0,0.18)' : 'rgba(255,255,255,0.06)'}`,
-                      borderRadius: '10px',
-                      padding: '12px 14px',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: '#fff',
-                          margin: 0,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {lead.name}
-                        {!lead.read && (
-                          <span
-                            style={{
-                              marginLeft: '6px',
-                              background: 'rgba(127,255,0,0.15)',
-                              color: '#7fff00',
-                              borderRadius: '999px',
-                              padding: '1px 6px',
-                              fontSize: '9px',
-                              fontWeight: 700,
-                            }}
-                          >
-                            NEW
-                          </span>
-                        )}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: '11px',
-                          color: 'rgba(255,255,255,0.35)',
-                          margin: '2px 0 0',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {lead.email}
-                        {lead.company && ` · ${lead.company}`}
-                      </p>
-                    </div>
-                    <span
+
+              {data.recentLeads.length === 0 ? (
+                <div
+                  style={{
+                    padding: '32px',
+                    textAlign: 'center',
+                    background: '#0a0a0a',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.25)',
+                  }}
+                >
+                  No leads yet
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  {data.recentLeads.map((lead) => (
+                    <div
+                      key={lead.id}
                       style={{
-                        fontSize: '11px',
-                        color: 'rgba(255,255,255,0.25)',
-                        flexShrink: 0,
-                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        background: '#0a0a0a',
+                        border: `1px solid ${!lead.read ? 'rgba(127,255,0,0.18)' : 'rgba(255,255,255,0.06)'}`,
+                        borderRadius: '10px',
+                        padding: '12px 14px',
                       }}
                     >
-                      {new Date(lead.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: '#fff',
+                            margin: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {lead.name}
+                          {!lead.read && (
+                            <span
+                              style={{
+                                marginLeft: '6px',
+                                background: 'rgba(127,255,0,0.15)',
+                                color: '#7fff00',
+                                borderRadius: '999px',
+                                padding: '1px 6px',
+                                fontSize: '9px',
+                                fontWeight: 700,
+                              }}
+                            >
+                              NEW
+                            </span>
+                          )}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: '11px',
+                            color: 'rgba(255,255,255,0.35)',
+                            margin: '2px 0 0',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {lead.email}
+                          {lead.company && ` · ${lead.company}`}
+                        </p>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          color: 'rgba(255,255,255,0.25)',
+                          flexShrink: 0,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {new Date(lead.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Recent posts + projects stacked */}
           <div style={{ display: 'grid', gap: '24px' }}>
@@ -447,14 +465,14 @@ export default async function AdminDashboard() {
                         }}
                       />
                       <span
-                          style={{
-                            flex: '1 1 100%',
-                            fontSize: '13px',
-                            color: '#fff',
-                            lineHeight: '1.5',
-                            wordBreak: 'break-word',
-                          }}
-                        >
+                        style={{
+                          flex: '1 1 100%',
+                          fontSize: '13px',
+                          color: '#fff',
+                          lineHeight: '1.5',
+                          wordBreak: 'break-word',
+                        }}
+                      >
                         {post.title}
                       </span>
                       <span

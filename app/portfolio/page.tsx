@@ -1,4 +1,5 @@
 import { buildMetadata } from '@/lib/metadata'
+import { sanitizeExternalUrl } from '@/lib/safe-url'
 import { Navbar } from '@/components/Navbar'
 import { SiteFooter } from '@/components/SiteFooter'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -106,9 +107,9 @@ export default async function PortfolioPage() {
                         >
                           Case study <span className="sr-only">for {project.title}</span>
                         </Link>
-                        {project.projectUrl && (
+                        {sanitizeExternalUrl(project.projectUrl) && (
                           <a
-                            href={project.projectUrl}
+                            href={sanitizeExternalUrl(project.projectUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Visit ${project.title} live site`}

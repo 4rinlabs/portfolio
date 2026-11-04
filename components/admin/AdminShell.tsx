@@ -17,12 +17,19 @@ const NAV = [
 export function AdminShell({
   children,
   email,
+  role,
 }: {
   children: ReactNode
   email?: string | null
+  role?: 'ADMIN' | 'EDITOR'
 }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Enforce role-based sidebar visibility: hide Leads from EDITOR accounts
+  const navItems = role === 'EDITOR'
+    ? NAV.filter((item) => item.href !== '/admin/leads')
+    : NAV
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -98,6 +105,7 @@ export function AdminShell({
       {/* Sidebar */}
       <aside
         role="dialog"
+        aria-label="Admin Navigation"
         style={{
           width: '220px',
           flexShrink: 0,
@@ -145,7 +153,7 @@ export function AdminShell({
 
         {/* Nav */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
-          {NAV.map((item) => {
+          {navItems.map((item) => {
             const active = item.exact
               ? pathname === item.href
               : pathname.startsWith(item.href)

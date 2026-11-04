@@ -1,7 +1,8 @@
 import { signIn } from '@/auth'
-import { AuthError } from 'next-auth'
+import { AuthError, CredentialsSignin } from 'next-auth'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import { getSafeRedirectUrl } from '@/lib/safe-redirect'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Login' }
@@ -12,6 +13,7 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ callbackUrl?: string; error?: string }>
 }) {
   const params = await searchParams
+  const safeCallbackUrl = getSafeRedirectUrl(params.callbackUrl, '/admin')
 
   async function loginAction(formData: FormData) {
     'use server'
@@ -19,14 +21,32 @@ export default async function AdminLoginPage({
       await signIn('credentials', {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
-        redirectTo: params.callbackUrl ?? '/admin',
+        redirectTo: safeCallbackUrl,
       })
     } catch (error) {
       if (error instanceof AuthError) {
-        redirect(`/admin/login?error=InvalidCredentials`)
+        if (error instanceof CredentialsSignin) {
+          if (error.code === 'TooManyRequests') {
+            redirect('/admin/login?error=TooManyRequests')
+          }
+          if (error.code === 'ServiceUnavailable') {
+            redirect('/admin/login?error=ServiceUnavailable')
+          }
+        }
+        redirect('/admin/login?error=InvalidCredentials')
       }
       throw error
     }
+  }
+
+  // Determine user-friendly, non-sensitive error message
+  let errorMessage: string | null = null
+  if (params.error === 'TooManyRequests') {
+    errorMessage = 'Too many login attempts. Please try again in 15 minutes.'
+  } else if (params.error === 'ServiceUnavailable') {
+    errorMessage = 'Authentication service temporarily unavailable. Please try again shortly.'
+  } else if (params.error) {
+    errorMessage = 'Invalid email or password.'
   }
 
   return (
@@ -67,6 +87,23 @@ export default async function AdminLoginPage({
         >
           4RinLabs
         </h1>
+
+        {errorMessage && (
+          <div
+            role="alert"
+            style={{
+              background: 'rgba(255, 50, 50, 0.1)',
+              border: '1px solid rgba(255, 50, 50, 0.3)',
+              borderRadius: '8px',
+              padding: '12px 14px',
+              color: '#ff6b6b',
+              fontSize: '13px',
+              marginBottom: '20px',
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
 
         <form action={loginAction} style={{ display: 'grid', gap: '16px' }}>
           <div>

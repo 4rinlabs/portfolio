@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { deleteBlogPostAction } from '@/actions/admin'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -18,6 +19,13 @@ export default async function AdminBlogPage({
   const session = await auth()
   if (!session) redirect('/admin/login')
 
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
+
   const { q, status } = await searchParams
   const publishedFilter =
     status === 'published' ? true : status === 'draft' ? false : undefined
@@ -30,7 +38,10 @@ export default async function AdminBlogPage({
     publishedAt: Date | null
     tags: string[]
     readingTime: number | null
+    authorId: string | null
   }[] = []
+
+  let authorMap = new Map<string, string>()
 
   try {
     posts = await prisma.blogPost.findMany({
@@ -48,9 +59,19 @@ export default async function AdminBlogPage({
         publishedAt: true,
         tags: true,
         readingTime: true,
+        authorId: true,
       },
       orderBy: { createdAt: 'desc' },
     })
+
+    const authorIds = Array.from(new Set(posts.map((p) => p.authorId).filter((id): id is string => Boolean(id))))
+    if (authorIds.length > 0) {
+      const authors = await prisma.user.findMany({
+        where: { id: { in: authorIds } },
+        select: { id: true, name: true, email: true },
+      })
+      authorMap = new Map(authors.map((a) => [a.id, a.name || a.email]))
+    }
   } catch {
     /* DB not connected */
   }
@@ -71,12 +92,8 @@ export default async function AdminBlogPage({
   ]
 
   return (
-    <AdminShell email={session.user.email}>
-      <div
-  style={{
-    padding: '24px',
-  }}
->
+    <AdminShell email={user.email} role={user.role}>
+      <div style={{ padding: '24px' }}>
         <AdminHeader
           title="Blog"
           subtitle={`${posts.length} post${posts.length !== 1 ? 's' : ''}`}
@@ -204,6 +221,7 @@ export default async function AdminBlogPage({
                   </div>
                   <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', margin: '4px 0 0' }}>
                     /{post.slug}
+                    {post.authorId && authorMap.has(post.authorId) && ` · by ${authorMap.get(post.authorId)}`}
                     {post.publishedAt && ` · ${new Date(post.publishedAt).toLocaleDateString()}`}
                     {post.readingTime && ` · ${post.readingTime} min read`}
                   </p>
@@ -260,24 +278,26 @@ export default async function AdminBlogPage({
                       ↗
                     </Link>
                   )}
-                  <form action={deleteBlogPostAction}>
-                    <input type="hidden" name="id" value={post.id} />
-                    <button
-                      type="submit"
-                      style={{
-                        padding: '6px 14px',
-                        background: 'rgba(255,50,50,0.08)',
-                        border: '1px solid rgba(255,50,50,0.2)',
-                        borderRadius: '8px',
-                        color: 'rgba(255,100,100,0.8)',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </form>
+                  {user.role === 'ADMIN' && (
+                    <form action={deleteBlogPostAction}>
+                      <input type="hidden" name="id" value={post.id} />
+                      <button
+                        type="submit"
+                        style={{
+                          padding: '6px 14px',
+                          background: 'rgba(255,50,50,0.08)',
+                          border: '1px solid rgba(255,50,50,0.2)',
+                          borderRadius: '8px',
+                          color: 'rgba(255,100,100,0.8)',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             ))}

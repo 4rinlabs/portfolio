@@ -21,6 +21,7 @@ model User {
   image         String?
   password      String?
   role          Role      @default(EDITOR)
+  tokenVersion  Int       @default(1)
   accounts      Account[]
   sessions      Session[]
   createdAt     DateTime  @default(now())
@@ -207,4 +208,18 @@ model ContactLead {
   message   String   @db.Text
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+
+// ─── Rate Limiting (Phase 3D: Consolidated PostgreSQL Engine) ─────────────────
+
+model RateLimitBucket {
+  key       String   @id
+  tokens    Int      @default(1)
+  windowEnd DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([windowEnd])
 }

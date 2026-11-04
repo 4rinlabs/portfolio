@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { requireAdminOrEditor } from '@/lib/auth-guard'
 import { deletePortfolioAction } from '@/actions/admin'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -18,6 +19,13 @@ export default async function AdminPortfolioPage({
 }) {
   const session = await auth()
   if (!session) redirect('/admin/login')
+
+  let user
+  try {
+    user = await requireAdminOrEditor(session)
+  } catch {
+    redirect('/admin/login')
+  }
 
   const { q } = await searchParams
 
@@ -59,12 +67,8 @@ export default async function AdminPortfolioPage({
   }
 
   return (
-    <AdminShell email={session.user.email}>
-      <div
-  style={{
-    padding: '24px',
-  }}
->
+    <AdminShell email={user.email} role={user.role}>
+      <div style={{ padding: '24px' }}>
         <AdminHeader
           title="Portfolio"
           subtitle={`${projects.length} project${projects.length !== 1 ? 's' : ''}`}
@@ -159,7 +163,6 @@ export default async function AdminPortfolioPage({
                     fill
                     className="object-cover"
                     sizes="340px"
-                    
                   />
                   {project.featured && (
                     <span
@@ -252,23 +255,25 @@ export default async function AdminPortfolioPage({
                     >
                       ↗
                     </Link>
-                    <form action={deletePortfolioAction}>
-                      <input type="hidden" name="id" value={project.id} />
-                      <button
-                        type="submit"
-                        style={{
-                          padding: '7px 12px',
-                          background: 'rgba(255,50,50,0.08)',
-                          border: '1px solid rgba(255,50,50,0.2)',
-                          borderRadius: '8px',
-                          color: 'rgba(255,100,100,0.8)',
-                          fontSize: '11px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </form>
+                    {user.role === 'ADMIN' && (
+                      <form action={deletePortfolioAction}>
+                        <input type="hidden" name="id" value={project.id} />
+                        <button
+                          type="submit"
+                          style={{
+                            padding: '7px 12px',
+                            background: 'rgba(255,50,50,0.08)',
+                            border: '1px solid rgba(255,50,50,0.2)',
+                            borderRadius: '8px',
+                            color: 'rgba(255,100,100,0.8)',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </div>
               </div>

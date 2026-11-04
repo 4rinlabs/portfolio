@@ -1,4 +1,14 @@
 import { z } from 'zod'
+import { isValidHttpUrl } from '@/lib/safe-url'
+
+/** Validates that an optional string is either empty or a valid HTTP/HTTPS URL */
+export const SafeUrlSchema = z
+  .string()
+  .refine((val) => !val || isValidHttpUrl(val), {
+    message: 'Must be a valid HTTP or HTTPS URL',
+  })
+  .optional()
+  .or(z.literal(''))
 
 // ─── Contact ──────────────────────────────────────────────────────────────────
 
@@ -61,12 +71,12 @@ export const PortfolioSchema = z.object({
   coverImage: z.string().optional().or(z.literal('')),
   projectUrl: z
     .string()
-    .url('Must be a valid URL')
+    .refine((val) => !val || isValidHttpUrl(val), 'Must be a valid HTTP or HTTPS URL')
     .optional()
     .or(z.literal('')),
   githubUrl: z
     .string()
-    .url('Must be a valid URL')
+    .refine((val) => !val || isValidHttpUrl(val), 'Must be a valid HTTP or HTTPS URL')
     .optional()
     .or(z.literal('')),
   featured: z.boolean().default(false),
@@ -112,8 +122,8 @@ export const ProductSchema = z.object({
   coverImage: z.string().optional().or(z.literal('')),
   tags: z.string().optional().or(z.literal('')),       // comma-separated, stored as array
   category: z.string().max(100).optional().or(z.literal('')),
-  productUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  githubUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  productUrl: z.string().refine((val) => !val || isValidHttpUrl(val), 'Must be a valid HTTP or HTTPS URL').optional().or(z.literal('')),
+  githubUrl: z.string().refine((val) => !val || isValidHttpUrl(val), 'Must be a valid HTTP or HTTPS URL').optional().or(z.literal('')),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
   order: z.number().int().min(0).default(0),

@@ -33,9 +33,10 @@ const init: ActionResult = { success: false }
 
 interface BlogPostFormProps {
   post?: BlogPost
+  authorLabel?: string | null
 }
 
-export function BlogPostForm({ post }: BlogPostFormProps) {
+export function BlogPostForm({ post, authorLabel }: BlogPostFormProps) {
   const isEdit = Boolean(post)
   const action = isEdit ? updateBlogPostAction : createBlogPostAction
 
@@ -97,6 +98,26 @@ export function BlogPostForm({ post }: BlogPostFormProps) {
         <div style={SECTION}>
           <p style={SECTION_TITLE}>Post Info</p>
           <div style={{ display: 'grid', gap: '16px' }}>
+            {isEdit && (
+              <div
+                style={{
+                  padding: '10px 14px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '12px',
+                }}
+              >
+                <span style={{ color: 'rgba(255,255,255,0.4)' }}>Author</span>
+                <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>
+                  {authorLabel ?? (post?.authorId ? `ID: ${post.authorId}` : 'Unassigned')}{' '}
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px', marginLeft: '6px' }}>(Preserved)</span>
+                </span>
+              </div>
+            )}
             <FormField label="Title" name="title" error={err.title?.[0]} required>
               <AdminInput
                 id="title"

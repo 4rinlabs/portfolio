@@ -430,26 +430,27 @@ async function runIntegrationTests() {
       assert.equal(mockDbLeads.length, 0)
     })
 
-    // ─── Test 9: PostgreSQL fallback concurrency limitations are explicitly tested and documented ───
-    await test('9. PostgreSQL fallback concurrency limitations are explicitly tested and documented', async () => {
+    // ─── Test 9: Contact rate limiter fails closed when Redis is unavailable, eliminating TOCTOU race conditions ───
+    await test('9. Contact rate limiter fails closed when Redis is unavailable, eliminating TOCTOU race conditions', async () => {
       resetEnvironment()
-      setRedisForTesting(null) // In fallback mode
+      setRedisForTesting(null) // Redis unavailable
 
       const fallbackEmail = 'concurrency@fallback.com'
-      // Documenting non-atomic TOCTOU check-then-insert:
-      // In PostgreSQL fallback, concurrent checkContactRateLimit calls at the same tick
-      // evaluate count before inserts occur.
+      // Under Phase 3C.5 hardening, the legacy non-atomic PostgreSQL count-then-insert fallback
+      // has been removed. All contact rate limit checks fail closed on Redis outage to prevent
+      // TOCTOU race conditions.
       const check1 = await checkContactRateLimit('10.0.0.1', fallbackEmail)
       const check2 = await checkContactRateLimit('10.0.0.2', fallbackEmail)
       const check3 = await checkContactRateLimit('10.0.0.3', fallbackEmail)
       const check4 = await checkContactRateLimit('10.0.0.4', fallbackEmail)
 
-      // Concurrency characteristic: all 4 read count === 0 simultaneously
-      assert.equal(check1.success, true)
-      assert.equal(check2.success, true)
-      assert.equal(check3.success, true)
-      assert.equal(check4.success, true)
+      // Strict fail-closed verification: all requests rejected cleanly
+      assert.equal(check1.success, false)
+      assert.equal(check2.success, false)
+      assert.equal(check3.success, false)
+      assert.equal(check4.success, false)
       assert.equal(check1.redisAvailable, false, 'Explicitly flags redisAvailable as false')
+      assert.ok(check1.message?.includes('temporarily unavailable'))
     })
 
     // ─── Test 10: Two valid submissions from the same email within 10 seconds both trigger admin notification attempts ───

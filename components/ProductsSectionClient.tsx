@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ExternalLink, ArrowRight } from 'lucide-react'
+import { sanitizeExternalUrl } from '@/lib/safe-url'
 
 type Product = {
   id: string
@@ -100,9 +101,9 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             <ArrowRight size={12} className="text-lime" aria-hidden />
           </Link>
 
-          {product.productUrl && (
+          {sanitizeExternalUrl(product.productUrl) && (
             <a
-              href={product.productUrl}
+              href={sanitizeExternalUrl(product.productUrl)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Visit ${product.name} live site`}
