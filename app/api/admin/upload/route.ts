@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { getAuthorizedUploadUser } from '@/lib/auth-guard'
 import { checkUploadRateLimit, getClientIp } from '@/lib/ratelimit'
 import { processUploadImage, MAX_FILE_SIZE } from '@/lib/image-processor'
+import { getSupabaseStorageClient, hasSupabaseTestOverride } from '@/lib/supabase-config'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? 'cms-media'
-
-let supabaseOverrideForTesting: any = null
-
-export function setSupabaseForTesting(client: any) {
-  supabaseOverrideForTesting = client
-}
 
 // 4 MB file limit + ~200 KB multipart boundary and header allowance = 4.2 MB
 // Vercel serverless request body platform ceiling is 4.5 MB (4,718,592 bytes).
@@ -72,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 4. Verify Supabase Storage configuration
-  if (!supabaseOverrideForTesting && (!supabaseUrl || !supabaseServiceKey)) {
+  if (!hasSupabaseTestOverride() && (!supabaseUrl || !supabaseServiceKey)) {
     return NextResponse.json({ error: 'Storage not configured' }, { status: 500 })
   }
 
@@ -110,7 +104,7 @@ export async function POST(req: NextRequest) {
   const path = `uploads/${fileName}`
 
   // 8. Upload to Supabase Storage with strict MIME type and immutable cache control
-  const supabase = supabaseOverrideForTesting || createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = getSupabaseStorageClient(supabaseUrl, supabaseServiceKey)
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, processedBuffer, {
     contentType,
     upsert: false,

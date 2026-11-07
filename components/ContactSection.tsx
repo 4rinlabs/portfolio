@@ -8,8 +8,18 @@ import Script from 'next/script'
 import { MagneticButton } from './MagneticButton'
 import { submitContact, type ContactActionState } from '@/actions/contact'
 
+const CLOUDFLARE_TEST_SITE_KEYS = new Set([
+  '1x00000000000000000000AA',
+  '2x00000000000000000000AB',
+  '3x00000000000000000000AA',
+])
+
+const rawSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || ''
+const isProduction = process.env.NODE_ENV === 'production'
+
+// Strictly reject missing or test keys in production; never use dummy test key fallback
 const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+  isProduction && CLOUDFLARE_TEST_SITE_KEYS.has(rawSiteKey) ? '' : rawSiteKey
 
 const social = [
   { href: 'https://wa.me/919961386952', label: 'WhatsApp', Icon: BsWhatsapp },
@@ -77,7 +87,9 @@ export function ContactSection() {
 
   return (
     <section id="contact" className="scroll-mt-24 bg-charcoal py-24 text-white md:py-32">
-      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+      {TURNSTILE_SITE_KEY ? (
+        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+      ) : null}
       <div className="site-container">
         <div className="grid gap-14 lg:grid-cols-[1fr_300px] xl:grid-cols-[1.15fr_280px] xl:gap-20">
           <motion.div
@@ -240,17 +252,41 @@ export function ContactSection() {
 
                     {/* Cloudflare Turnstile Challenge Widget */}
                     <div className="my-1 min-h-[65px]">
-                      <div
-                        className="cf-turnstile"
-                        data-sitekey={TURNSTILE_SITE_KEY}
-                        data-action="contact_form"
-                        data-theme="dark"
-                      />
+                      {TURNSTILE_SITE_KEY ? (
+                        <div
+                          className="cf-turnstile"
+                          data-sitekey={TURNSTILE_SITE_KEY}
+                          data-action="contact_form"
+                          data-theme="dark"
+                        />
+                      ) : (
+                        <div
+                          role="status"
+                          className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs leading-relaxed text-white/70"
+                        >
+                          Security verification is temporarily unavailable. Please reach out directly to us via{' '}
+                          <a
+                            href="https://wa.me/919961386952"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lime underline hover:text-lime/80"
+                          >
+                            WhatsApp
+                          </a>{' '}
+                          or email at{' '}
+                          <a
+                            href="mailto:4rinlabs@gmail.com"
+                            className="text-lime underline hover:text-lime/80"
+                          >
+                            4rinlabs@gmail.com
+                          </a>.
+                        </div>
+                      )}
                     </div>
 
                     <MagneticButton
                       type="submit"
-                      disabled={isPending}
+                      disabled={isPending || !TURNSTILE_SITE_KEY}
                       className="btn-lime-primary btn-glitch flex w-fit items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isPending ? (

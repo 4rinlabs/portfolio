@@ -11,7 +11,8 @@ import {
 import { getAuthorizedUploadUser, setAuthGuardForTesting } from '../lib/auth-guard'
 import { checkUploadRateLimit, setRedisForTesting } from '../lib/ratelimit'
 import { prisma } from '../lib/prisma'
-import { POST, setSupabaseForTesting } from '../app/api/admin/upload/route'
+import { POST } from '../app/api/admin/upload/route'
+import { setSupabaseForTesting } from '../lib/supabase-config'
 import { NextRequest } from 'next/server'
 
 // Test runner helper

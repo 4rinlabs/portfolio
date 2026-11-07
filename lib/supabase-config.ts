@@ -1,5 +1,22 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { createClient } from '@supabase/supabase-js'
+
+let supabaseOverrideForTesting: any = null
+
+export function setSupabaseForTesting(client: any): void {
+  supabaseOverrideForTesting = client
+}
+
+export function getSupabaseStorageClient(supabaseUrl: string, supabaseServiceKey: string) {
+  return supabaseOverrideForTesting || createClient(supabaseUrl, supabaseServiceKey)
+}
+
+export function hasSupabaseTestOverride(): boolean {
+  return Boolean(supabaseOverrideForTesting)
+}
+
+let localFallbackUrl: string | null = null
 
 /**
  * Attempts to load NEXT_PUBLIC_SUPABASE_URL from local .env if not yet populated in process.env.
@@ -7,7 +24,7 @@ import * as path from 'path'
  * external dotenv packages.
  */
 function loadLocalEnvIfMissing(): void {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || localFallbackUrl) {
     return
   }
 
@@ -19,7 +36,7 @@ function loadLocalEnvIfMissing(): void {
         const trimmed = line.trim()
         if (trimmed.startsWith('NEXT_PUBLIC_SUPABASE_URL=')) {
           const val = trimmed.slice(25).trim().replace(/^["']|["']$/g, '')
-          process.env.NEXT_PUBLIC_SUPABASE_URL = val
+          localFallbackUrl = val
           break
         }
       }
@@ -45,7 +62,7 @@ export function resolveSupabaseHostname(explicitUrl?: string): string {
 
   const raw = explicitUrl !== undefined
     ? explicitUrl
-    : (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL)
+    : (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || localFallbackUrl)
 
   if (!raw || typeof raw !== 'string' || raw.trim() === '') {
     throw new Error(
